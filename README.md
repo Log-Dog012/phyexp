@@ -41,5 +41,5 @@
 
 ## 反馈与贡献
 
-- 如有 bug 或需求，欢迎在 [Gitee 仓库](你的仓库地址) 提交 Issues  
+- 如有 bug 或需求，欢迎在 [Gitee 仓库](https://gitee.com/Log-Dog012/phyexp) 提交 Issues  
 - 欢迎 Fork 仓库并提交 Pull Request，一起完善这个工具！
