@@ -5,6 +5,7 @@
 from . import *
 from typing import Union, List
 from .AB_uncert import 求A类不确定度, 不确定度合成
+from uncertainties.core import UFloat, AffineScalarFunc
 
 class 数量(Q_):
     '''
@@ -30,15 +31,22 @@ class 数量(Q_):
     #        编号 += 1
     #        yield 编号
 
-    def __new__(cls, 数值:float, 单位:str="", B类不确定度:float=0.0, 名称:str=""):
+    def __new__(cls, 数值, 单位:str="", B类不确定度:float=0.0, 名称:str=""):
         # 一次测量结果的不确定度等于其B类不确定度
-        带不确定度的数值 = ufloat(数值, B类不确定度, tag=名称 if 名称 else None)
+        if isinstance(数值,(UFloat, AffineScalarFunc)):
+            # 处理非手动输入的构造
+            带不确定度的数值 = 数值
+        else:
+            带不确定度的数值 = ufloat(数值, B类不确定度, tag=名称 if 名称 else None)
         obj = super().__new__(cls, 带不确定度的数值, 单位)
         return obj
     
     @property
     def 名称(self):
-        return self.magnitude.tag
+        if hasattr(self.magnitude, 'tag'):
+            return self.magnitude.tag
+        else:
+            return None
     @名称.setter
     def 名称(self, 新名称:str):
         self.magnitude.tag = 新名称
@@ -91,24 +99,5 @@ class 数量(Q_):
             return super().__repr__()
         
 class 数量组(Q_):
-    '''
-    带不确定度的数量组类，继承自pint的Quantity类
-    包含数值列表、单位、B类不确定度列表和名称属性
-    也可以通过带不确定度的数值列表属性直接访问和修改
-    例子:
-        qg = 数量组([10, 12, 11], "m/s", [0.5, 0.4, 0.6], "速度组")
-        print(qg.数值列表)  # [10, 12, 11]
-        print(qg.单位)  # m/s
-        print(qg.B类不确定度列表)  # [0.5, 0.4, 0.6]
-        print(qg.名称)  # 速度组
-        print(qg.带不确定度的数值列表)  # [10.0 +/- 0.5, 12.0 +/- 0.4, 11.0 +/- 0.6]
-    '''
-    def __new__(cls, 数值列表:List[float], 单位:str="", B类不确定度列表:Union[List[float],float]=0.0, 名称:str=""):
-        A类不确定度 = 求A类不确定度(数值列表)
-        不确定度=不确定度合成(A类不确定度, B类不确定度列表)
-        带不确定度的数值列表 = uarray(数值列表, 不确定度)
-        obj = super().__new__(cls, 带不确定度的数值列表, 单位)
-        obj.名称 = 名称 if 名称 else None
-        obj.A类不确定度值 = A类不确定度
-        return obj
+    ...
 
