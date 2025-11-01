@@ -3,7 +3,7 @@
 """
 
 from . import *
-
+from numpy import asarray
 
 def 求A类不确定度(测量值列表):
     """
@@ -25,7 +25,7 @@ def 求A类不确定度(测量值列表):
 A_uncert = 求A类不确定度
 
 
-def 仪器误差限转B类不确定度(仪器误差限, K=np.sqrt(3)):
+def 仪器误差限转B类不确定度(仪器误差限, K=3**0.5):
     """
     将仪器误差限转换为B类不确定度，默认误差服从均匀分布。
 
@@ -41,10 +41,41 @@ def 仪器误差限转B类不确定度(仪器误差限, K=np.sqrt(3)):
 
 InstErr_to_B_uncert = 仪器误差限转B类不确定度
 
+def 数字列表转arr(数字列表):
+    """
+    将数字列表转换为numpy数组。
 
-def 不确定度合成(分量数组):
+    参数:
+    数字列表: 一组数字。
+
+    返回:
+    numpy.ndarray: 转换后的数组。
+    """
+    if isinstance(数字列表, (list, tuple)) and all(isinstance(x, (int, float)) for x in 数字列表):
+        return asarray(数字列表)
+    else:
+        return 数字列表
+    
+def 输入检查(func):
+    """
+    装饰器：将输入调整为不确定度合成所需类型。
+
+    参数:
+    func: 需要装饰的函数。
+
+    返回:
+    function: 装饰后的函数。
+    """
+    def wrapper(A分量, B分量):
+        A分量, B分量 = 数字列表转arr(A分量), 数字列表转arr(B分量)
+        return func(A分量, B分量)
+    return wrapper
+
+@输入检查
+def 不确定度合成(A分量, B分量):
     """
     计算不确定度合成，基于各分量的不确定度平方和的平方根。
+    只能处理标量输入和数组输入。
 
     参数:
     分量: 各分量的不确定度列表。
@@ -52,7 +83,6 @@ def 不确定度合成(分量数组):
     返回:
     float: 合成不确定度。
     """
-    return (分量数组**2).sum() ** 0.5
-
+    return (A分量**2+B分量**2) ** 0.5
 
 uncert_comb = 不确定度合成
