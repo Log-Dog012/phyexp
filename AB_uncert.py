@@ -2,8 +2,9 @@
 物理实验中涉及的不确定度计算
 """
 
-from . import *
+from .utils import *
 from numpy import asarray
+
 
 def 数字列表转arr(数字列表):
     """
@@ -15,11 +16,14 @@ def 数字列表转arr(数字列表):
     返回:
     numpy.ndarray: 转换后的数组。
     """
-    if isinstance(数字列表, (list, tuple)) and all(isinstance(x, (int, float)) for x in 数字列表):
+    if isinstance(数字列表, (list, tuple)) and all(
+        isinstance(x, (int, float)) for x in 数字列表
+    ):
         return asarray(数字列表)
     else:
         return 数字列表
-    
+
+
 def 输入转换(func):
     """
     装饰器：将输入调整为不确定度合成所需类型。
@@ -30,10 +34,13 @@ def 输入转换(func):
     返回:
     function: 装饰后的函数。
     """
+
     def wrapper(*分量):
         新分量 = [数字列表转arr(i) for i in 分量]
         return func(*新分量)
+
     return wrapper
+
 
 @输入转换
 def 求A类不确定度(测量值列表):
@@ -72,6 +79,7 @@ def 仪器误差限转B类不确定度(仪器误差限, K=3**0.5):
 
 InstErr_to_B_uncert = 仪器误差限转B类不确定度
 
+
 @输入转换
 def 不确定度合成(A分量, B分量):
     """
@@ -84,6 +92,7 @@ def 不确定度合成(A分量, B分量):
     返回:
     float: 合成不确定度。
     """
-    return (A分量**2+B分量**2) ** 0.5
+    return (A分量**2 + B分量**2) ** 0.5
+
 
 uncert_comb = 不确定度合成
