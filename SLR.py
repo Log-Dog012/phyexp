@@ -2,7 +2,7 @@
 带不确定度的一元线性回归
 """
 
-from . import *
+from .utils import *
 from AB_uncert import 不确定度合成
 
 
