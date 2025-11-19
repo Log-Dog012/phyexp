@@ -2,7 +2,7 @@
 测量量
 '''
 
-from utils import *
+from .utils import *
 from typing import Sequence
 from .AB_uncert import 求A类不确定度, 不确定度合成
 from uncertainties.core import UFloat, AffineScalarFunc
