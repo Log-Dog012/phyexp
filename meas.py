@@ -6,6 +6,7 @@ from .utils import *
 from typing import Sequence
 from .AB_uncert import 求A类不确定度, 不确定度合成
 from uncertainties.core import UFloat, AffineScalarFunc
+import numpy as np
         
 def 一次测量结果(数值, 单位:str="", B类不确定度:float=0.0, 名称:str=""):
     # 一次测量结果的不确定度等于其B类不确定度
