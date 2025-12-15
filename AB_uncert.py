@@ -42,7 +42,6 @@ def 输入转换(func):
     return wrapper
 
 
-@输入转换
 def 求A类不确定度(测量值列表):
     """
     计算A类不确定度，基于测量值的标准偏差。
@@ -53,9 +52,12 @@ def 求A类不确定度(测量值列表):
     返回:
     float: A类不确定度。
     """
-    n = len(测量值列表)
-    平均值 = 测量值列表.mean()
-    标准偏差 = (((测量值列表 - 平均值) ** 2).sum() / (n - 1) / n) ** 0.5
+    if len(测量值列表) < 2:
+        raise ValueError("测量值列表至少应包含两个值以计算A类不确定度。")
+    try:
+        标准偏差 =测量值列表.std(ddof=1)
+    except AttributeError:
+        标准偏差 = asarray(测量值列表).std(ddof=1)
 
     return 标准偏差
 
