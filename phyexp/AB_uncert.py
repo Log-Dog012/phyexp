@@ -2,7 +2,7 @@
 物理实验中涉及的不确定度计算
 """
 
-from .utils import *
+# from .utils import *
 from numpy import asarray
 
 
@@ -52,7 +52,13 @@ def 求A类不确定度(测量值列表):
     返回:
     float: A类不确定度。
     """
-    if len(测量值列表) < 2:
+    # if len(测量值列表) < 2:
+    #     raise ValueError("测量值列表至少应包含两个值以计算A类不确定度。")
+    try:
+        测量值列表[1] # 测试是否有足够的元素
+    except TypeError:
+        raise ValueError("输入应为测量值列表")
+    except IndexError:
         raise ValueError("测量值列表至少应包含两个值以计算A类不确定度。")
     try:
         标准偏差 =测量值列表.std(ddof=1)
