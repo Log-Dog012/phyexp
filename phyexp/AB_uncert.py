@@ -2,8 +2,8 @@
 物理实验中涉及的不确定度计算
 """
 
-# from .utils import *
 from numpy import asarray
+import warnings
 
 
 def 数字列表转arr(数字列表):
@@ -44,22 +44,29 @@ def 输入转换(func):
 
 def 求A类不确定度(测量值列表):
     """
-    计算A类不确定度，基于测量值的标准偏差。
+    计算A类不确定度，基于测量值的标准偏差（贝塞尔公式，ddof=1）。
 
     参数:
-    测量值列表: 一组测量值。
+    测量值列表: 一组测量值（支持列表、元组、np数组、生成器、pint带单位量等可迭代对象）。
 
     返回:
-    float: A类不确定度。
+    float/np.float64/pint.Quantity: A类不确定度（输入带单位则返回带单位结果）。
     """
-    # if len(测量值列表) < 2:
-    #     raise ValueError("测量值列表至少应包含两个值以计算A类不确定度。")
     try:
-        测量值列表[1] # 测试是否有足够的元素
+        if len(测量值列表) < 2:
+            raise ValueError("测量值列表至少应包含两个值以计算A类不确定度。")
     except TypeError:
-        raise ValueError("输入应为测量值列表")
-    except IndexError:
-        raise ValueError("测量值列表至少应包含两个值以计算A类不确定度。")
+        if hasattr(测量值列表,"__iter__"):
+            测量值列表=list(测量值列表)
+            warnings.warn(
+                "生成器已被迭代并转换为列表，后续无法再次使用此生成器（生成器是一次性迭代对象）。",
+                UserWarning,  # 警告类型（用户级警告，最常用）
+                stacklevel=2   # 控制警告的栈层级，让用户看到自己的代码行（而非函数内部）
+            )
+            if len(测量值列表) < 2:
+                raise ValueError("测量值列表至少应包含两个值以计算A类不确定度。")
+        else:
+            raise ValueError("输入应为测量值列表")
     try:
         标准偏差 =测量值列表.std(ddof=1)
     except AttributeError:
