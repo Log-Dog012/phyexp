@@ -1,14 +1,16 @@
 from setuptools import setup, find_packages
 import os
 
+
 def read_readme():
     """读取README.md作为长描述"""
     here = os.path.abspath(os.path.dirname(__file__))
     try:
-        with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
+        with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError:
         return "大学物理实验数据处理库"
+
 
 setup(
     name="phyexp",
@@ -24,15 +26,15 @@ setup(
         "numpy>=1.18.0",
         "matplotlib>=3.3.0",
         "pint>=0.18",
-        "uncertainties>=3.1.6"
+        "uncertainties>=3.1.6",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Intended Audience :: Education",
-        "Topic :: Scientific/Engineering :: Physics"
+        "Topic :: Scientific/Engineering :: Physics",
     ],
-    python_requires='>=3.6',  # 最低Python版本要求
-    license="MIT"
+    python_requires=">=3.6",  # 最低Python版本要求
+    license="MIT",
 )

@@ -2,6 +2,7 @@ from uncertainties import UFloat
 from uncertainties import ufloat
 from math import log10, floor
 
+
 def 修约(带不确定度数值: UFloat, 字符串形式=True):
     """修约一个不确定度数值到其有效数字位数。
 
@@ -25,12 +26,15 @@ def 修约(带不确定度数值: UFloat, 字符串形式=True):
             return f"{修约值:g}"
         else:
             return 修约值
+
+
 # 无法处理单位
 
 
 from uncertainties import ufloat_fromstr as u
 from uncertainties.umath import *
-'''
+
+"""
 用u来创建需考虑不确定度的数值，并直接使用数学函数进行计算
 可以用dir()查看可用的函数
-'''
+"""
