@@ -3,7 +3,7 @@
 """
 
 from .utils import *
-from AB_uncert import 不确定度合成
+from .AB_uncert import 不确定度合成
 
 
 class 一元线性回归:
