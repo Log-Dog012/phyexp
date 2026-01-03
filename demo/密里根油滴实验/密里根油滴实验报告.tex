@@ -1,0 +1,1235 @@
+% Default to the notebook output style
+
+    
+
+
+% Inherit from the specified cell style.
+\documentclass[11pt]{ctexrep}
+
+    
+
+    % Basic figure setup, for now with no caption control since it's done
+    % automatically by Pandoc (which extracts ![](path) syntax from Markdown).
+    \usepackage{graphicx}
+    % Keep aspect ratio if custom image width or height is specified
+    \setkeys{Gin}{keepaspectratio}
+    % Maintain compatibility with old templates. Remove in nbconvert 6.0
+    \let\Oldincludegraphics\includegraphics
+    % Ensure that by default, figures have no caption (until we provide a
+    % proper Figure object with a Caption API and a way to capture that
+    % in the conversion process - todo).
+    \usepackage{caption}
+    \DeclareCaptionFormat{nocaption}{}
+    \captionsetup{format=nocaption,aboveskip=0pt,belowskip=0pt}
+
+    \usepackage{float}
+    \floatplacement{figure}{H} % forces figures to be placed at the correct location
+    \usepackage{xcolor} % Allow colors to be defined
+    \usepackage{enumerate} % Needed for markdown enumerations to work
+    \usepackage{geometry} % Used to adjust the document margins
+    \usepackage{amsmath} % Equations
+    \usepackage{amssymb} % Equations
+    \usepackage{textcomp} % defines textquotesingle
+    % Hack from http://tex.stackexchange.com/a/47451/13684:
+    \AtBeginDocument{%
+        \def\PYZsq{\textquotesingle}% Upright quotes in Pygmentized code
+    }
+    \usepackage{upquote} % Upright quotes for verbatim code
+    \usepackage{eurosym} % defines \euro
+
+    \usepackage{iftex}
+    \ifPDFTeX
+        \usepackage[T1]{fontenc}
+        \IfFileExists{alphabeta.sty}{
+              \usepackage{alphabeta}
+          }{
+              \usepackage[mathletters]{ucs}
+              \usepackage[utf8x]{inputenc}
+          }
+    \else
+        \usepackage{fontspec}
+        \usepackage{unicode-math}
+    \fi
+
+    \usepackage{fancyvrb} % verbatim replacement that allows latex
+    \usepackage{grffile} % extends the file name processing of package graphics
+                         % to support a larger range
+    \makeatletter % fix for old versions of grffile with XeLaTeX
+    \@ifpackagelater{grffile}{2019/11/01}
+    {
+      % Do nothing on new versions
+    }
+    {
+      \def\Gread@@xetex#1{%
+        \IfFileExists{"\Gin@base".bb}%
+        {\Gread@eps{\Gin@base.bb}}%
+        {\Gread@@xetex@aux#1}%
+      }
+    }
+    \makeatother
+    \usepackage[Export]{adjustbox} % Used to constrain images to a maximum size
+    \adjustboxset{max size={0.9\linewidth}{0.9\paperheight}}
+
+    % The hyperref package gives us a pdf with properly built
+    % internal navigation ('pdf bookmarks' for the table of contents,
+    % internal cross-reference links, web links for URLs, etc.)
+    \usepackage{hyperref}
+    % The default LaTeX title has an obnoxious amount of whitespace. By default,
+    % titling removes some of it. It also provides customization options.
+    \usepackage{titling}
+    \usepackage{longtable} % longtable support required by pandoc >1.10
+    \usepackage{booktabs}  % table support for pandoc > 1.12.2
+    \usepackage{array}     % table support for pandoc >= 2.11.3
+    \usepackage{calc}      % table minipage width calculation for pandoc >= 2.11.1
+    \usepackage[inline]{enumitem} % IRkernel/repr support (it uses the enumerate* environment)
+    \usepackage[normalem]{ulem} % ulem is needed to support strikethroughs (\sout)
+                                % normalem makes italics be italics, not underlines
+    \usepackage{soul}      % strikethrough (\st) support for pandoc >= 3.0.0
+    \usepackage{mathrsfs}
+    \usepackage{listings}
+    \lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray!70},
+    stringstyle=\color{green!60!black},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    frame=single,
+    breaklines=true,
+    showspaces=false,
+    showstringspaces=false,
+    % escapeinside={\%*}{*)} % 用于在代码中插入LaTeX命令（如需）
+    }
+
+    
+    
+    % Colors for the hyperref package
+    \definecolor{urlcolor}{rgb}{0,.145,.698}
+    \definecolor{linkcolor}{rgb}{.71,0.21,0.01}
+    \definecolor{citecolor}{rgb}{.12,.54,.11}
+
+    % ANSI colors
+    \definecolor{ansi-black}{HTML}{3E424D}
+    \definecolor{ansi-black-intense}{HTML}{282C36}
+    \definecolor{ansi-red}{HTML}{E75C58}
+    \definecolor{ansi-red-intense}{HTML}{B22B31}
+    \definecolor{ansi-green}{HTML}{00A250}
+    \definecolor{ansi-green-intense}{HTML}{007427}
+    \definecolor{ansi-yellow}{HTML}{DDB62B}
+    \definecolor{ansi-yellow-intense}{HTML}{B27D12}
+    \definecolor{ansi-blue}{HTML}{208FFB}
+    \definecolor{ansi-blue-intense}{HTML}{0065CA}
+    \definecolor{ansi-magenta}{HTML}{D160C4}
+    \definecolor{ansi-magenta-intense}{HTML}{A03196}
+    \definecolor{ansi-cyan}{HTML}{60C6C8}
+    \definecolor{ansi-cyan-intense}{HTML}{258F8F}
+    \definecolor{ansi-white}{HTML}{C5C1B4}
+    \definecolor{ansi-white-intense}{HTML}{A1A6B2}
+    \definecolor{ansi-default-inverse-fg}{HTML}{FFFFFF}
+    \definecolor{ansi-default-inverse-bg}{HTML}{000000}
+
+    % common color for the border for error outputs.
+    \definecolor{outerrorbackground}{HTML}{FFDFDF}
+
+    % commands and environments needed by pandoc snippets
+    % extracted from the output of `pandoc -s`
+    \providecommand{\tightlist}{%
+      \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+    \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+    % Add ',fontsize=\small' for more characters per line
+    \newenvironment{Shaded}{}{}
+    \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{{#1}}}
+    \newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{{#1}}}}
+    \newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{{#1}}}
+    \newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{{#1}}}
+    \newcommand{\RegionMarkerTok}[1]{{#1}}
+    \newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\NormalTok}[1]{{#1}}
+
+    % Additional commands for more recent versions of Pandoc
+    \newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{{#1}}}
+    \newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{{#1}}}
+    \newcommand{\ImportTok}[1]{{#1}}
+    \newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{{#1}}}}
+    \newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{{#1}}}
+    \newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{{#1}}}
+    \newcommand{\BuiltInTok}[1]{{#1}}
+    \newcommand{\ExtensionTok}[1]{{#1}}
+    \newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{{#1}}}
+    \newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{{#1}}}
+    \newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \makeatletter
+    \newsavebox\pandoc@box
+    \newcommand*\pandocbounded[1]{%
+      \sbox\pandoc@box{#1}%
+      % scaling factors for width and height
+      \Gscale@div\@tempa\textheight{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+      \Gscale@div\@tempb\linewidth{\wd\pandoc@box}%
+      % select the smaller of both
+      \ifdim\@tempb\p@<\@tempa\p@
+        \let\@tempa\@tempb
+      \fi
+      % scaling accordingly (\@tempa < 1)
+      \ifdim\@tempa\p@<\p@
+        \scalebox{\@tempa}{\usebox\pandoc@box}%
+      % scaling not needed, use as it is
+      \else
+        \usebox{\pandoc@box}%
+      \fi
+    }
+    \makeatother
+
+    % Define a nice break command that doesn't care if a line doesn't already
+    % exist.
+    \def\br{\hspace*{\fill} \\* }
+    % Math Jax compatibility definitions
+    \def\gt{>}
+    \def\lt{<}
+    \let\Oldtex\TeX
+    \let\Oldlatex\LaTeX
+    \renewcommand{\TeX}{\textrm{\Oldtex}}
+    \renewcommand{\LaTeX}{\textrm{\Oldlatex}}
+    % Document parameters
+    % Document title
+    \title{密里根实验报告}
+    
+    
+    
+    
+    
+    
+    
+
+    % Pygments definitions
+    
+\makeatletter
+\def\PY@reset{\let\PY@it=\relax \let\PY@bf=\relax%
+    \let\PY@ul=\relax \let\PY@tc=\relax%
+    \let\PY@bc=\relax \let\PY@ff=\relax}
+\def\PY@tok#1{\csname PY@tok@#1\endcsname}
+\def\PY@toks#1+{\ifx\relax#1\empty\else%
+    \PY@tok{#1}\expandafter\PY@toks\fi}
+\def\PY@do#1{\PY@bc{\PY@tc{\PY@ul{%
+    \PY@it{\PY@bf{\PY@ff{#1}}}}}}}
+\def\PY#1#2{\PY@reset\PY@toks#1+\relax+\PY@do{#2}}
+
+\@namedef{PY@tok@w}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.73,0.73}{##1}}}
+\@namedef{PY@tok@c}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cp}{\def\PY@tc##1{\textcolor[rgb]{0.61,0.40,0.00}{##1}}}
+\@namedef{PY@tok@k}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kp}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kt}{\def\PY@tc##1{\textcolor[rgb]{0.69,0.00,0.25}{##1}}}
+\@namedef{PY@tok@o}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@ow}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\@namedef{PY@tok@nb}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@nf}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@nc}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@nn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@ne}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.80,0.25,0.22}{##1}}}
+\@namedef{PY@tok@nv}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@no}{\def\PY@tc##1{\textcolor[rgb]{0.53,0.00,0.00}{##1}}}
+\@namedef{PY@tok@nl}{\def\PY@tc##1{\textcolor[rgb]{0.46,0.46,0.00}{##1}}}
+\@namedef{PY@tok@ni}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.44,0.44,0.44}{##1}}}
+\@namedef{PY@tok@na}{\def\PY@tc##1{\textcolor[rgb]{0.41,0.47,0.13}{##1}}}
+\@namedef{PY@tok@nt}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@nd}{\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\@namedef{PY@tok@s}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sd}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@si}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.64,0.35,0.47}{##1}}}
+\@namedef{PY@tok@se}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.36,0.12}{##1}}}
+\@namedef{PY@tok@sr}{\def\PY@tc##1{\textcolor[rgb]{0.64,0.35,0.47}{##1}}}
+\@namedef{PY@tok@ss}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@sx}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@m}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@gh}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\@namedef{PY@tok@gu}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.50,0.00,0.50}{##1}}}
+\@namedef{PY@tok@gd}{\def\PY@tc##1{\textcolor[rgb]{0.63,0.00,0.00}{##1}}}
+\@namedef{PY@tok@gi}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.52,0.00}{##1}}}
+\@namedef{PY@tok@gr}{\def\PY@tc##1{\textcolor[rgb]{0.89,0.00,0.00}{##1}}}
+\@namedef{PY@tok@ge}{\let\PY@it=\textit}
+\@namedef{PY@tok@gs}{\let\PY@bf=\textbf}
+\@namedef{PY@tok@ges}{\let\PY@bf=\textbf\let\PY@it=\textit}
+\@namedef{PY@tok@gp}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\@namedef{PY@tok@go}{\def\PY@tc##1{\textcolor[rgb]{0.44,0.44,0.44}{##1}}}
+\@namedef{PY@tok@gt}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.27,0.87}{##1}}}
+\@namedef{PY@tok@err}{\def\PY@bc##1{{\setlength{\fboxsep}{\string -\fboxrule}\fcolorbox[rgb]{1.00,0.00,0.00}{1,1,1}{\strut ##1}}}}
+\@namedef{PY@tok@kc}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kd}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kr}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@bp}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@fm}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@vc}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vg}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vi}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vm}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@sa}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sb}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sc}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@dl}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@s2}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sh}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@s1}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@mb}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mf}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mh}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mi}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@il}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mo}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@ch}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cm}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cpf}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@c1}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cs}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+
+\def\PYZbs{\char`\\}
+\def\PYZus{\char`\_}
+\def\PYZob{\char`\{}
+\def\PYZcb{\char`\}}
+\def\PYZca{\char`\^}
+\def\PYZam{\char`\&}
+\def\PYZlt{\char`\<}
+\def\PYZgt{\char`\>}
+\def\PYZsh{\char`\#}
+\def\PYZpc{\char`\%}
+\def\PYZdl{\char`\$}
+\def\PYZhy{\char`\-}
+\def\PYZsq{\char`\'}
+\def\PYZdq{\char`\"}
+\def\PYZti{\char`\~}
+% for compatibility with earlier versions
+\def\PYZat{@}
+\def\PYZlb{[}
+\def\PYZrb{]}
+\makeatother
+
+
+    % Exact colors from NB
+    \definecolor{incolor}{rgb}{0.0, 0.0, 0.5}
+    \definecolor{outcolor}{rgb}{0.545, 0.0, 0.0}
+
+
+
+    
+    % Prevent overflowing lines due to hard-to-break entities
+    \sloppy
+    % Setup hyperref package
+    \hypersetup{
+      breaklinks=true,  % so long urls are correctly broken across lines
+      colorlinks=true,
+      urlcolor=urlcolor,
+      linkcolor=linkcolor,
+      citecolor=citecolor,
+      }
+    % Slightly bigger margins than the latex defaults
+    
+    \geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+    
+    
+
+\begin{document}
+    
+    
+    \maketitle
+    
+    
+    \tableofcontents
+
+
+    
+\chapter{实验目的}\label{ux5b9eux9a8cux76eeux7684}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  通过密立根油滴实验精确测量基本电荷 \(e\) 的数值；
+\item
+  验证电荷的量子化特性（即任何带电体的电荷量都是基本电荷的整数倍）；
+\item
+  使用\texttt{uncertainties}库的不确定度计算与\texttt{pint}库单位管理；
+\item
+  展示 \texttt{phyexp}
+  库在实验数据处理中的应用例如带不确定度的加权线性拟合，简化计算流程。
+\end{enumerate}
+
+\chapter{实验原理}\label{ux5b9eux9a8cux539fux7406}
+
+\section{公式推导}\label{ux516cux5f0fux63a8ux5bfc}
+
+\subsection{油滴半径的计算}\label{ux6cb9ux6ef4ux534aux5f84ux7684ux8ba1ux7b97}
+
+当油滴在重力和空气粘滞力作用下匀速下落时，受力平衡满足：\\
+重力 $ F_g = mg = \frac{4}{3}\pi a^3 \rho g $\\
+粘滞力 $ F_\eta = 6\pi \eta a v_g $（斯托克斯定律）
+
+联立平衡条件 $ F_g = F_\eta $，结合下落速度 $ v_g = \frac{l}{t_g}
+$（$ l $ 为下落距离，$ t_g $ 为下落时间），解得油滴半径：\\
+\[ a = \sqrt{\frac{9\eta l}{2\rho g t_g}} \]
+
+\subsection{油滴电荷量的计算}\label{ux6cb9ux6ef4ux7535ux8377ux91cfux7684ux8ba1ux7b97}
+
+当油滴在电场中静止时，电场力与重力平衡：\\
+电场力 $ F_e = qE = q\frac{U}{d} $（$ U $ 为平衡电压，$ d $ 为极板间距）\\
+联立 $ F_e = F_g $，代入油滴半径公式，最终得到电荷量：\\
+\[ q =
+\frac{18\pi}{\sqrt{2\rho g}} \left(
+\frac{\eta l}{t_g \left(1+\frac{b}{pa}\right)}
+\right)^{\frac{3}{2}} \frac{d}{U} \]
+
+\section{基本电荷 $ e $
+的求解方法}\label{ux57faux672cux7535ux8377-e-ux7684ux6c42ux89e3ux65b9ux6cd5}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{平均法}：由 $ q = ne $ 得 $ n = \text{round}\left(
+  \frac{|q|}{|e_{\text{公认}}|} \right) $，再通过 $ \overline{e} =
+  \frac{\sum q}{\sum n} $ 求解；
+\item
+  \textbf{加权线性拟合}：以电荷数 $ n $ （同上）为横坐标、电荷量 $ q
+  $ 为纵坐标，采用加权最小二乘拟合 $ q = a + bn $，斜率 $ b $ 即为
+  $ e $；
+\item
+  \textbf{作图法}：绘制 $ n-q $
+  方格图，若通过原点的一条射线穿过多个图中格点则验证电荷量子化，提取格点数据计算
+  $ e_i = \frac{q_i}{n_i} $，取平均值作为测量结果。
+\end{enumerate}
+
+\chapter{实验仪器与常数}\label{ux5b9eux9a8cux4eeaux5668ux4e0eux5e38ux6570}
+
+\section{实验仪器}\label{ux5b9eux9a8cux4eeaux5668}
+
+OM99 CCD微机密里根油滴仪和喷雾器 
+
+\section{实验常数} 
+\begin{table}[htbp]
+  \centering
+  \begin{tabular}{|l|l|l|l|}
+    \hline
+    物理量 & 数值 & 单位 & 备注 \\
+    \hline
+    油的密度 $\rho$ & 981 & $\text{kg·m}^{-3}$ & 20℃时油的密度 \\
+    \hline
+    重力加速度 $g$ & 9.801 & $\text{m·s}^{-2}$ & 当地重力加速度 \\
+    \hline
+    空气粘度 $\eta$ & $1.83 \times 10^{-5}$ & $\text{kg·m}^{-1}·\text{s}^{-1}$ & 20℃时空气粘度 \\
+    \hline
+    下落距离 $l$ & $1.5 \pm 0.01$ & $\text{mm}$ & 转换为 $1.5 \times 10^{-3}\text{m}$，不确定度 $0.01\text{mm}$ \\
+    \hline
+    修正系数 $b$ & $8.224 \times 10^{-3}$ & $\text{m·Pa}$ & 空气分子修正系数 \\
+    \hline
+    大气压 $p$ & $1.013 \times 10^5$ & $\text{Pa}$ & 标准大气压 \\
+    \hline
+    极板间距 $d$ & $5 \times 10^{-3}$ & $\text{m}$ & 极板间距离 \\
+    \hline
+    电压仪器误差限 $\Delta U$ & 0.5 & $\text{V}$ & 平衡电压测量误差 \\
+    \hline
+    反应时间误差限 $\Delta t$ & 0.005 & $\text{s}$ & 人工计时反应时间误差 \\
+    \hline
+    基本电荷公认值 $e_{\text{公认}}$ & $-1.602176634 \times 10^{-19}$ & $\text{C}$ & 国际公认值 \\
+    \hline
+  \end{tabular}
+  \caption{实验常数（$t=20^\circ\text{C}$）}
+  \label{tab:experiment_constants}
+\end{table}
+
+\chapter{原始数据}\label{ux539fux59cbux6570ux636e}
+
+\begin{table}[htbp]
+  \centering
+  \renewcommand{\arraystretch}{1.2} % 增加行间距，避免内容拥挤
+  \begin{tabular}{|c|c|p{6cm}|c|} % p{6cm} 固定列宽，自动换行
+    \hline
+    \multicolumn{4}{|c|}{测量数据记录（$t=20^\circ\text{C}$）} \\
+    \hline
+    测量序号 & 平衡电压 $U/\text{V}$ & 下落时间 $t_g/\text{s}$（多次测量） & 时间均值 $\overline{t_g}/\text{s}$ \\
+    \hline
+    1 & 118 & 10.61, 10.57, 10.44, 10.62, 10.27 & 10.502 \\
+    \hline
+    2 & 103 & 8.34, 8.30, 8.26, 8.30, 8.42 & 8.324 \\
+    \hline
+    3 & 149 & 9.84, 10.04, 9.77, 9.94, 10.12 & 9.942 \\
+    \hline
+    4 & 101 & 11.11, 11.39, 11.21, 10.93, 11.04 & 11.136 \\
+    \hline
+    5 & 100 & 12.90, 12.79, 13.11, 12.81, 13.09 & 12.940 \\
+    \hline
+    6 & 124 & 19.37, 18.51, 19.41, 19.02, 18.84 & 19.030 \\
+    \hline
+    7 & 107 & 11.06, 11.13, 11.01, 10.93, 11.24 & 11.074 \\
+    \hline
+    8 & 105 & 21.19, 21.50, 21.16, 20.83, 21.44 & 21.224 \\
+    \hline
+    9 & 100 & 9.28, 9.22, 9.18, 9.16, 9.21 & 9.210 \\
+    \hline
+    10 & 127 & 18.87, 19.15, 19.11, 19.01, 18.78 & 18.984 \\
+    \hline
+  \end{tabular}
+  \caption{密立根油滴实验原始测量数据}
+  \label{tab:raw_measurements}
+\end{table}
+
+\chapter{数据处理}\label{ux6570ux636eux5904ux7406}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}1}]:} \PY{k+kn}{import}\PY{+w}{ }\PY{n+nn}{numpy}\PY{+w}{ }\PY{k}{as}\PY{+w}{ }\PY{n+nn}{np}
+        \PY{k+kn}{import}\PY{+w}{ }\PY{n+nn}{phyexp}
+        \PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{phyexp}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{SLR}\PY{p}{,} \PY{n}{plt}
+        \PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{phyexp}\PY{n+nn}{.}\PY{n+nn}{AB\PYZus{}uncert}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{A\PYZus{}uncert}\PY{p}{,} \PY{n}{仪器误差限转B类不确定度}\PY{p}{,} \PY{n}{不确定度合成}
+        \PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{phyexp}\PY{n+nn}{.}\PY{n+nn}{meas}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{一次测量结果}\PY{p}{,} \PY{n}{多次测量结果}\PY{p}{,} \PY{n}{ureg}\PY{p}{,} \PY{n}{Q\PYZus{}} \PY{c+c1}{\PYZsh{} 单位}
+        \PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{phyexp}\PY{n+nn}{.}\PY{n+nn}{error}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{相对误差}
+        \PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{uncertainties}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{unumpy} \PY{k}{as} \PY{n}{unp} \PY{c+c1}{\PYZsh{} 不确定度}
+        \PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{uncertainties}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{ufloat} \PY{c+c1}{\PYZsh{} 不确定度}
+        \PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{matplotlib}\PY{n+nn}{.}\PY{n+nn}{ticker}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{AutoMinorLocator}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}2}]:} \PY{n}{t\PYZus{}raw} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}
+            \PY{p}{[}\PY{l+m+mf}{10.61}\PY{p}{,} \PY{l+m+mf}{10.57}\PY{p}{,} \PY{l+m+mf}{10.44}\PY{p}{,} \PY{l+m+mf}{10.62}\PY{p}{,} \PY{l+m+mf}{10.27}\PY{p}{]}\PY{p}{,}
+            \PY{p}{[}\PY{l+m+mf}{8.34}\PY{p}{,} \PY{l+m+mf}{8.30}\PY{p}{,} \PY{l+m+mf}{8.26}\PY{p}{,} \PY{l+m+mf}{8.30}\PY{p}{,} \PY{l+m+mf}{8.42}\PY{p}{]}\PY{p}{,}
+            \PY{p}{[}\PY{l+m+mf}{9.84}\PY{p}{,} \PY{l+m+mf}{10.04}\PY{p}{,} \PY{l+m+mf}{9.77}\PY{p}{,} \PY{l+m+mf}{9.94}\PY{p}{,} \PY{l+m+mf}{10.12}\PY{p}{]}\PY{p}{,}
+            \PY{p}{[}\PY{l+m+mf}{11.11}\PY{p}{,} \PY{l+m+mf}{11.39}\PY{p}{,} \PY{l+m+mf}{11.21}\PY{p}{,} \PY{l+m+mf}{10.93}\PY{p}{,} \PY{l+m+mf}{11.04}\PY{p}{]}\PY{p}{,}
+            \PY{p}{[}\PY{l+m+mf}{12.90}\PY{p}{,} \PY{l+m+mf}{12.79}\PY{p}{,} \PY{l+m+mf}{13.11}\PY{p}{,} \PY{l+m+mf}{12.81}\PY{p}{,} \PY{l+m+mf}{13.09}\PY{p}{]}\PY{p}{,}
+            \PY{p}{[}\PY{l+m+mf}{19.37}\PY{p}{,} \PY{l+m+mf}{18.51}\PY{p}{,} \PY{l+m+mf}{19.41}\PY{p}{,} \PY{l+m+mf}{19.02}\PY{p}{,} \PY{l+m+mf}{18.84}\PY{p}{]}\PY{p}{,}
+            \PY{p}{[}\PY{l+m+mf}{11.06}\PY{p}{,} \PY{l+m+mf}{11.13}\PY{p}{,} \PY{l+m+mf}{11.01}\PY{p}{,} \PY{l+m+mf}{10.93}\PY{p}{,} \PY{l+m+mf}{11.24}\PY{p}{]}\PY{p}{,}
+            \PY{p}{[}\PY{l+m+mf}{21.19}\PY{p}{,} \PY{l+m+mf}{21.50}\PY{p}{,} \PY{l+m+mf}{21.16}\PY{p}{,} \PY{l+m+mf}{20.83}\PY{p}{,} \PY{l+m+mf}{21.44}\PY{p}{]}\PY{p}{,}
+            \PY{p}{[}\PY{l+m+mf}{9.28}\PY{p}{,} \PY{l+m+mf}{9.22}\PY{p}{,} \PY{l+m+mf}{9.18}\PY{p}{,} \PY{l+m+mf}{9.16}\PY{p}{,} \PY{l+m+mf}{9.21}\PY{p}{]}\PY{p}{,}
+            \PY{p}{[}\PY{l+m+mf}{18.87}\PY{p}{,} \PY{l+m+mf}{19.15}\PY{p}{,} \PY{l+m+mf}{19.11}\PY{p}{,} \PY{l+m+mf}{19.01}\PY{p}{,} \PY{l+m+mf}{18.78}\PY{p}{]}
+        \PY{p}{]}\PY{p}{)}\PY{o}{*}\PY{n}{ureg}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{s}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+        
+        \PY{n}{u\PYZus{}raw} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{l+m+mi}{118}\PY{p}{,} \PY{l+m+mi}{103}\PY{p}{,} \PY{l+m+mi}{149}\PY{p}{,} \PY{l+m+mi}{101}\PY{p}{,} \PY{l+m+mi}{100}\PY{p}{,} \PY{l+m+mi}{124}\PY{p}{,} \PY{l+m+mi}{107}\PY{p}{,} \PY{l+m+mi}{105}\PY{p}{,} \PY{l+m+mi}{100}\PY{p}{,} \PY{l+m+mi}{127}\PY{p}{]}\PY{p}{)}\PY{o}{*}\PY{n}{ureg}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{V}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}3}]:} \PY{c+c1}{\PYZsh{} 实验常数定义（带单位）}
+        \PY{n}{rho} \PY{o}{=} \PY{n}{Q\PYZus{}}\PY{p}{(}\PY{l+m+mi}{981}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{kg/m\PYZca{}3}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}  \PY{c+c1}{\PYZsh{} 油的密度}
+        \PY{n}{g} \PY{o}{=} \PY{n}{Q\PYZus{}}\PY{p}{(}\PY{l+m+mf}{9.801}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m/s\PYZca{}2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}  \PY{c+c1}{\PYZsh{} 重力加速度}
+        \PY{n}{eta} \PY{o}{=} \PY{n}{Q\PYZus{}}\PY{p}{(}\PY{l+m+mf}{1.83e\PYZhy{}5}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Pa*s}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}  \PY{c+c1}{\PYZsh{} 空气粘度}
+        \PY{n}{b} \PY{o}{=} \PY{n}{Q\PYZus{}}\PY{p}{(}\PY{l+m+mf}{8.224e\PYZhy{}3}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m·Pa}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}  \PY{c+c1}{\PYZsh{} 修正系数}
+        \PY{n}{p} \PY{o}{=} \PY{n}{Q\PYZus{}}\PY{p}{(}\PY{l+m+mf}{1.013e5}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Pa}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}  \PY{c+c1}{\PYZsh{} 大气压}
+        \PY{n}{d} \PY{o}{=} \PY{n}{Q\PYZus{}}\PY{p}{(}\PY{l+m+mf}{5e\PYZhy{}3}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}  \PY{c+c1}{\PYZsh{} 极板间距}
+        \PY{n}{e\PYZus{}known} \PY{o}{=} \PY{n}{Q\PYZus{}}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{l+m+mf}{1.602176634e\PYZhy{}19}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{C}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}  \PY{c+c1}{\PYZsh{} 基本电荷公认值}
+\end{Verbatim}
+
+为简单起见，我们把来自人眼判断是否与线重合及停止计时的反应时间的误差合并,取估计值
+0.01mm
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}4}]:} \PY{n}{l} \PY{o}{=} \PY{n}{一次测量结果}\PY{p}{(}\PY{l+m+mf}{1.5}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{mm}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{仪器误差限转B类不确定度}\PY{p}{(}\PY{l+m+mf}{0.01}\PY{p}{)}\PY{p}{)}\PY{o}{.}\PY{n}{to}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)} \PY{c+c1}{\PYZsh{} 下落距离，转换为m}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}5}]:} \PY{n}{t}\PY{o}{=}\PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{多次测量结果}\PY{p}{(}\PY{n}{data}\PY{o}{.}\PY{n}{magnitude}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{s}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{B类不确定度}\PY{o}{=}\PY{n}{仪器误差限转B类不确定度}\PY{p}{(}\PY{l+m+mf}{0.5}\PY{p}{)}\PY{p}{,}\PY{n}{名称}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{时间}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)} \PY{k}{for} \PY{n}{data} \PY{o+ow}{in} \PY{n}{t\PYZus{}raw}\PY{p}{]}\PY{p}{)}
+        \PY{n}{u}\PY{o}{=}\PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{一次测量结果}\PY{p}{(}\PY{n}{data}\PY{o}{.}\PY{n}{magnitude}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{V}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{仪器误差限转B类不确定度}\PY{p}{(}\PY{l+m+mf}{0.5}\PY{p}{)}\PY{p}{)} \PY{k}{for} \PY{n}{data} \PY{o+ow}{in} \PY{n}{u\PYZus{}raw}\PY{p}{]}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}6}]:} \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{时间均值：}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+        \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{10}\PY{p}{)}\PY{p}{:}
+            \PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{第}\PY{l+s+si}{\PYZob{}}\PY{n}{i}\PY{o}{+}\PY{l+m+mi}{1}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{组：}\PY{l+s+si}{\PYZob{}}\PY{n}{t}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+        \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{电压：}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+        \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{10}\PY{p}{)}\PY{p}{:}
+            \PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{第}\PY{l+s+si}{\PYZob{}}\PY{n}{i}\PY{o}{+}\PY{l+m+mi}{1}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{组：}\PY{l+s+si}{\PYZob{}}\PY{n}{u}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+时间均值：
+第1组：10.50+/-0.30 second
+第2组：8.32+/-0.29 second
+第3组：9.94+/-0.30 second
+第4组：11.14+/-0.30 second
+第5组：12.94+/-0.30 second
+第6组：19.03+/-0.33 second
+第7组：11.07+/-0.29 second
+第8组：21.22+/-0.31 second
+第9组：9.21+/-0.29 second
+第10组：18.98+/-0.30 second
+电压：
+第1组：118.00+/-0.29 volt
+第2组：103.00+/-0.29 volt
+第3组：149.00+/-0.29 volt
+第4组：101.00+/-0.29 volt
+第5组：100.00+/-0.29 volt
+第6组：124.00+/-0.29 volt
+第7组：107.00+/-0.29 volt
+第8组：105.00+/-0.29 volt
+第9组：100.00+/-0.29 volt
+第10组：127.00+/-0.29 volt
+
+    \end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}7}]:} \PY{k}{def}\PY{+w}{ }\PY{n+nf}{计算油滴半径}\PY{p}{(}\PY{n}{t}\PY{p}{)}\PY{p}{:}
+        \PY{+w}{    }\PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}根据时间t计算油滴半径a\PYZdq{}\PYZdq{}\PYZdq{}}    
+            \PY{n}{a} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{p}{(}\PY{l+m+mi}{9} \PY{o}{*} \PY{n}{eta} \PY{o}{*} \PY{n}{l} \PY{o}{/} \PY{p}{(}\PY{l+m+mi}{2} \PY{o}{*} \PY{n}{rho} \PY{o}{*} \PY{n}{g} \PY{o}{*} \PY{n}{i}\PY{p}{)}\PY{p}{)}\PY{o}{*}\PY{o}{*}\PY{l+m+mf}{0.5} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n}{t}\PY{p}{]}\PY{p}{)}
+            \PY{k}{return} \PY{n}{a}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}8}]:} \PY{n}{a}\PY{o}{=}\PY{n}{计算油滴半径}\PY{p}{(}\PY{n}{t}\PY{p}{)}
+        \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{油滴半径：}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+        \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{10}\PY{p}{)}\PY{p}{:}
+            \PY{n}{a}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{o}{.}\PY{n}{ito}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{micrometre}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+            \PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{第}\PY{l+s+si}{\PYZob{}}\PY{n}{i}\PY{o}{+}\PY{l+m+mi}{1}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{组：}\PY{l+s+si}{\PYZob{}}\PY{n}{a}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+油滴半径：
+第1组：1.106+/-0.016 micrometer
+第2组：1.242+/-0.022 micrometer
+第3组：1.137+/-0.017 micrometer
+第4组：1.074+/-0.015 micrometer
+第5组：0.996+/-0.012 micrometer
+第6组：0.822+/-0.007 micrometer
+第7组：1.077+/-0.014 micrometer
+第8组：0.778+/-0.006 micrometer
+第9组：1.181+/-0.019 micrometer
+第10组：0.823+/-0.007 micrometer
+
+    \end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}9}]:} \PY{k}{def}\PY{+w}{ }\PY{n+nf}{计算电荷量}\PY{p}{(}\PY{n}{t}\PY{p}{,} \PY{n}{u}\PY{p}{,} \PY{n}{a}\PY{p}{)}\PY{p}{:}
+         \PY{+w}{    }\PY{l+s+sd}{\PYZdq{}\PYZdq{}\PYZdq{}根据密立根公式计算电荷量q（带单位）\PYZdq{}\PYZdq{}\PYZdq{}}
+             \PY{n}{term1} \PY{o}{=} \PY{l+m+mi}{18} \PY{o}{*} \PY{n}{np}\PY{o}{.}\PY{n}{pi} \PY{o}{/} \PY{p}{(}\PY{l+m+mi}{2} \PY{o}{*} \PY{n}{rho} \PY{o}{*} \PY{n}{g}\PY{p}{)}\PY{o}{*}\PY{o}{*}\PY{l+m+mf}{0.5}
+             \PY{n}{term2} \PY{o}{=} \PY{p}{(}\PY{n}{eta} \PY{o}{*} \PY{n}{l}\PY{p}{)} \PY{o}{/} \PY{p}{(}\PY{n}{t} \PY{o}{*} \PY{p}{(}\PY{l+m+mi}{1} \PY{o}{+} \PY{n}{b}\PY{o}{/}\PY{p}{(}\PY{n}{p}\PY{o}{*}\PY{n}{a}\PY{p}{)}\PY{p}{)}\PY{p}{)}  \PY{c+c1}{\PYZsh{} 含修正项}
+             \PY{n}{term3} \PY{o}{=} \PY{n}{d} \PY{o}{/} \PY{n}{u}
+             \PY{n}{q} \PY{o}{=} \PY{n}{term1} \PY{o}{*} \PY{p}{(}\PY{n}{term2} \PY{o}{*}\PY{o}{*} \PY{l+m+mf}{1.5}\PY{p}{)} \PY{o}{*} \PY{n}{term3}
+             \PY{k}{return} \PY{n}{q}
+         
+         \PY{n}{q} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{计算电荷量}\PY{p}{(}\PY{n}{t}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{,} \PY{n}{u}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{,} \PY{n}{a}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{)} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{10}\PY{p}{)}\PY{p}{]}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}10}]:} \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{电荷量q：}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+         \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{10}\PY{p}{)}\PY{p}{:}
+             \PY{n}{q}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{o}{.}\PY{n}{ito}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{C}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+             \PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{第}\PY{l+s+si}{\PYZob{}}\PY{n}{i}\PY{o}{+}\PY{l+m+mi}{1}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{组：}\PY{l+s+si}{\PYZob{}}\PY{n}{q}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+电荷量q：
+第1组：(2.08+/-0.09)e-18 coulomb
+第2组：(3.41+/-0.18)e-18 coulomb
+第3组：(1.79+/-0.08)e-18 coulomb
+第4组：(2.21+/-0.09)e-18 coulomb
+第5组：(1.77+/-0.06)e-18 coulomb
+第6组：(7.82+/-0.22)e-19 coulomb
+第7组：(2.11+/-0.09)e-18 coulomb
+第8组：(7.78+/-0.19)e-19 coulomb
+第9组：(3.00+/-0.15)e-18 coulomb
+第10组：(7.67+/-0.19)e-19 coulomb
+
+    \end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}11}]:} \PY{n}{n} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n+nb}{round}\PY{p}{(}\PY{n+nb}{abs}\PY{p}{(}\PY{n}{qq}\PY{o}{.}\PY{n}{magnitude}\PY{o}{.}\PY{n}{n} \PY{o}{/} \PY{n}{e\PYZus{}known}\PY{o}{.}\PY{n}{magnitude}\PY{p}{)}\PY{p}{)} \PY{k}{for} \PY{n}{qq} \PY{o+ow}{in} \PY{n}{q}\PY{p}{]}\PY{p}{)}
+         
+         \PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{电荷数n（整数）：}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+         \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{10}\PY{p}{)}\PY{p}{:}
+             \PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{第}\PY{l+s+si}{\PYZob{}}\PY{n}{i}\PY{o}{+}\PY{l+m+mi}{1}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{组：n=}\PY{l+s+si}{\PYZob{}}\PY{n}{n}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+电荷数n（整数）：
+第1组：n=13
+第2组：n=21
+第3组：n=11
+第4组：n=14
+第5组：n=11
+第6组：n=5
+第7组：n=13
+第8组：n=5
+第9组：n=19
+第10组：n=5
+
+    \end{Verbatim}
+
+\section{平均法}\label{ux5e73ux5747ux6cd5}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}12}]:} \PY{n}{e1}\PY{o}{=}\PY{n}{q}\PY{o}{.}\PY{n}{sum}\PY{p}{(}\PY{p}{)}\PY{o}{/}\PY{n}{n}\PY{o}{.}\PY{n}{sum}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}13}]:} \PY{n}{error1}\PY{o}{=}\PY{n}{相对误差}\PY{p}{(}\PY{n}{e1}\PY{p}{,}\PY{o}{\PYZhy{}}\PY{n}{e\PYZus{}known}\PY{p}{,}\PY{k+kc}{True}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}14}]:} \PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{平均法求得|e1| = }\PY{l+s+si}{\PYZob{}}\PY{n}{e1}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+         \PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{平均法相对误差：}\PY{l+s+si}{\PYZob{}}\PY{n}{error1}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+平均法求得|e1| = (1.598+/-0.028)e-19 coulomb
+平均法相对误差：-0.241\%
+
+    \end{Verbatim}
+
+\section{加权线性拟合}\label{ux52a0ux6743ux7ebfux6027ux62dfux5408}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}15}]:} \PY{n}{y}\PY{o}{=}\PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{i}\PY{o}{.}\PY{n}{magnitude} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n}{q}\PY{p}{]}\PY{p}{)}
+         \PY{n}{x}\PY{o}{=}\PY{n}{n}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}16}]:} \PY{n}{a}\PY{p}{,}\PY{n}{b}\PY{o}{=}\PY{n}{SLR}\PY{o}{.}\PY{n}{一元线性回归}\PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{n}{y}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}17}]:} \PY{n}{e2}\PY{o}{=}\PY{n}{Q\PYZus{}}\PY{p}{(}\PY{n}{b}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{C}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+         \PY{n}{error2}\PY{o}{=}\PY{n}{相对误差}\PY{p}{(}\PY{n}{e2}\PY{p}{,}\PY{o}{\PYZhy{}}\PY{n}{e\PYZus{}known}\PY{p}{,}\PY{k+kc}{True}\PY{p}{)}
+         \PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{平均法求得|e2| = }\PY{l+s+si}{\PYZob{}}\PY{n}{e2}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+         \PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{平均法相对误差：}\PY{l+s+si}{\PYZob{}}\PY{n}{error2}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+加权线性拟合求得|e2| = (1.63+/-0.05)e-19 coulomb
+加权线性拟合相对误差：1.698\%
+
+    \end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}18}]:} \PY{n}{SLR}\PY{o}{.}\PY{n}{绘制回归图}\PY{p}{(}\PY{n}{Q\PYZus{}}\PY{p}{(}\PY{n}{x}\PY{p}{)}\PY{p}{,}\PY{n}{q}\PY{p}{,}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{电荷量\PYZhy{}个数图}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{个数}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{电荷}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{密里根实验报告_files/密里根实验报告_27_0.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+\section{作图法}\label{ux4f5cux56feux6cd5}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}19}]:} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n}{y}\PY{p}{:}
+             \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{25}\PY{p}{]}\PY{p}{,}\PY{p}{[}\PY{n}{i}\PY{o}{.}\PY{n}{n}\PY{p}{,}\PY{n}{i}\PY{o}{.}\PY{n}{n}\PY{p}{]}\PY{p}{,}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{k}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{linewidth}\PY{o}{=}\PY{l+m+mf}{0.8}\PY{p}{)}
+         \PY{n}{plt}\PY{o}{.}\PY{n}{title}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{n\PYZhy{}q方格图}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+         \PY{n}{plt}\PY{o}{.}\PY{n}{xlabel}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{n}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+         \PY{n}{plt}\PY{o}{.}\PY{n}{ylabel}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{q/C}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+         \PY{n}{plt}\PY{o}{.}\PY{n}{xlim}\PY{p}{(}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{25}\PY{p}{]}\PY{p}{)}
+         \PY{n}{plt}\PY{o}{.}\PY{n}{ylim}\PY{p}{(}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mf}{4e\PYZhy{}18}\PY{p}{]}\PY{p}{)}
+         \PY{n}{plt}\PY{o}{.}\PY{n}{xticks}\PY{p}{(}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{10}\PY{p}{,}\PY{l+m+mi}{20}\PY{p}{]}\PY{p}{)}
+         \PY{n}{plt}\PY{o}{.}\PY{n}{yticks}\PY{p}{(}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mf}{1e\PYZhy{}18}\PY{p}{,}\PY{l+m+mf}{2e\PYZhy{}18}\PY{p}{,}\PY{l+m+mf}{3e\PYZhy{}18}\PY{p}{,}\PY{l+m+mf}{4e\PYZhy{}18}\PY{p}{]}\PY{p}{)}
+         \PY{n}{plt}\PY{o}{.}\PY{n}{minorticks\PYZus{}on}\PY{p}{(}\PY{p}{)}
+         \PY{n}{plt}\PY{o}{.}\PY{n}{gca}\PY{p}{(}\PY{p}{)}\PY{o}{.}\PY{n}{xaxis}\PY{o}{.}\PY{n}{set\PYZus{}minor\PYZus{}locator}\PY{p}{(}\PY{n}{AutoMinorLocator}\PY{p}{(}\PY{n}{n}\PY{o}{=}\PY{l+m+mi}{10}\PY{p}{)}\PY{p}{)}
+         \PY{c+c1}{\PYZsh{} plt.gca().yaxis.set\PYZus{}minor\PYZus{}locator(AutoMinorLocator(n=10))}
+         \PY{n}{plt}\PY{o}{.}\PY{n}{grid}\PY{p}{(}\PY{n}{axis}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{x}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{which}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{major}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}  \PY{n}{linewidth}\PY{o}{=}\PY{l+m+mf}{0.8}\PY{p}{,} \PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{r}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{alpha}\PY{o}{=}\PY{l+m+mf}{0.8}\PY{p}{)}  \PY{c+c1}{\PYZsh{} 主网格}
+         \PY{n}{plt}\PY{o}{.}\PY{n}{grid}\PY{p}{(}\PY{n}{axis}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{x}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{which}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{minor}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}  \PY{n}{linewidth}\PY{o}{=}\PY{l+m+mf}{0.4}\PY{p}{,} \PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{r}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{alpha}\PY{o}{=}\PY{l+m+mf}{0.5}\PY{p}{)}  \PY{c+c1}{\PYZsh{} 次网格}
+         \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{p}{[}\PY{l+m+mi}{12}\PY{p}{,}\PY{l+m+mi}{13}\PY{p}{,}\PY{l+m+mi}{15}\PY{p}{]}\PY{p}{:}
+             \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,}\PY{n}{i}\PY{p}{,}\PY{l+m+mi}{25}\PY{p}{]}\PY{p}{,}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,}\PY{n}{y}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{o}{.}\PY{n}{n}\PY{p}{,}\PY{l+m+mi}{25}\PY{o}{/}\PY{n}{i}\PY{o}{*}\PY{n}{y}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}\PY{o}{.}\PY{n}{n}\PY{p}{]}\PY{p}{,}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{\PYZhy{}\PYZhy{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{c}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{k}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{linewidth}\PY{o}{=}\PY{l+m+mf}{0.8}\PY{p}{)}
+         \PY{n}{plt}\PY{o}{.}\PY{n}{show}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{密里根实验报告_files/密里根实验报告_29_0.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+中间的射线更接近所有格点，取所有格点的平均，结果与平均法相同。本方法优势是不需要已知基本电荷值，可以验证电荷的量子性。
+
+\chapter{实验结果与分析}\label{ux516dux5b9eux9a8cux7ed3ux679cux4e0eux5206ux6790}
+
+\section{核心结果汇总}\label{ux6838ux5fc3ux7ed3ux679cux6c47ux603b}
+
+{%\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.2545}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.5636}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1818}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+方法
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+基本电荷 $ e $（含不确定度）
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+相对误差
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+平均法 & $ (1.60 \pm 0.03) \times 10^{-19} \text{C} $ &
+0.24\% \\
+加权线性拟合 & $ (1.63 \pm 0.05) \times 10^{-19} \text{C} $ &
+1.7\% \\
+作图法 & $ (1.60 \pm 0.03) \times 10^{-19} \text{C} $ &
+0.24\% \\
+\end{longtable}
+}
+
+\section{结果分析}\label{ux7ed3ux679cux5206ux6790}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  三种方法测得的基本电荷 $ e $ 均与公认值 $ 1.602176634 \times 10^{-19} \text{C} $
+  接近，相对误差均小于2\%，验证了电荷的量子化特性；
+\item
+  作图法通过 $ n-q $ 方格图直观验证了``电荷量是基本电荷整数倍''；
+\end{enumerate}
+
+\chapter{实验结论}\label{ux4e03ux5b9eux9a8cux7ed3ux8bba}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  本实验通过密立根油滴法成功测量了基本电荷 \$ e
+  \$，三种方法的测量结果均与公认值一致，其中平均法的相对误差最小（0.24\%），最终实验结果为
+  \$ e = (1.60 \pm 0.03) \times 10\^{}\{-19\} , \text{C} \$；
+\item
+  实验结果验证了电荷的量子化特性，即带电体的电荷量是基本电荷的整数倍；
+\item
+  \texttt{uncertainties}库实现了便捷的不确定度计算，\texttt{pint}库规范了物理量单位管理，\texttt{phyexp}库简化了加权线性拟合等复杂数据处理流程，提高了实验效率和计算准确性，适用于物理实验中的数据处理场景。
+\end{enumerate}
+
+
+    % Add a bibliography block to the postdoc
+
+    \appendix
+\chapter{使用的工具与依赖库}
+\section{开发与编辑环境}
+本实验的代码编写、交互式运行与结果调试均基于 \texttt{Jupyter Notebook}（v7.5.1）完成，该工具为 Python 生态的交互式计算环境，支持代码分段执行、实时可视化与文本注释结合，适配物理实验数据处理的迭代式分析需求。
+
+\section{核心依赖库}
+实验数据处理代码中使用的主要 Python 库及版本如下：
+\begin{enumerate}
+  \item \texttt{numpy}（v2.3.5）：用于数组运算、数值计算（如均值/标准差求解等）；
+  \item \texttt{matplotlib}（v3.10.6）：用于实验结果的可视化（如电荷量-电荷数关系图、不确定度误差棒图等）；
+  \item \texttt{uncertainties}（v3.2.3）：用于带不确定度的数值计算与误差传播分析；
+  \item \texttt{pint}（v0.25）：用于物理量的单位定义、转换与维度一致性校验。
+\end{enumerate}
+
+\section{官方文档}
+
+官方文档参考：
+\begin{itemize}
+  \item Jupyter Notebook：\texttt{https://jupyter-notebook.readthedocs.io/en/stable/}；
+  \item numpy：\texttt{https://numpy.org/doc/stable/}；
+  \item matplotlib：\texttt{https://matplotlib.org/stable/contents.html}；
+  \item uncertainties：\texttt{https://uncertainties.readthedocs.io/en/latest/}；
+  \item pint：\texttt{https://pint.readthedocs.io/en/stable/}。
+\end{itemize}
+    
+\chapter{phyexp 库主要代码说明}
+
+phyexp 是面向物理实验场景开发的轻量级 Python 工具库，旨在简化物理实验数据处理流程，封装了不确定度计算、测量值处理、误差分析、线性回归等实验数据处理的核心功能，降低重复编码成本。
+
+本库的远程代码仓库地址为：\texttt{https://gitee.com/Log-Dog012/phyexp}。
+
+以下将逐一说明库中核心代码模块的实现逻辑与功能用途：
+
+1. 单位与不确定度基础工具（phyexp/utils.py）
+\begin{lstlisting}[caption=phyexp/utils.py 代码内容, label=lst:utils]
+"""
+物理量单位与不确定度基础工具
+"""
+from pint import UnitRegistry
+
+ureg = UnitRegistry(auto_reduce_dimensions=True)
+Q_ = ureg.Quantity
+
+# pint的Measurements不具备误差传播能力
+from uncertainties import ufloat
+from uncertainties.unumpy import uarray
+\end{lstlisting}
+
+2. 绘图配置（phyexp/plt.py）
+\begin{lstlisting}[caption=phyexp/plt.py 代码内容, label=lst:plt]
+"""
+绘图配置工具
+"""
+from matplotlib.pyplot import *
+
+# 设置中文字体和负号正常显示
+rcParams["font.family"] = ["SimSun"]
+rcParams["axes.unicode_minus"] = False
+\end{lstlisting}
+
+3. 带不确定度的一元线性回归（phyexp/SLR.py）
+\begin{lstlisting}[caption=phyexp/SLR.py 代码内容, label=lst:slr]
+"""
+带不确定度的一元线性回归
+"""
+
+from .utils import ureg, Q_
+from .AB_uncert import 不确定度合成
+from functools import wraps
+import numpy as np
+from . import plt
+from .error import 提取标称值
+
+def 提取不确定度(带不确定度的数值):
+    """提取带不确定度的数值的不确定度。"""
+    if hasattr(带不确定度的数值, "magnitude") and hasattr(带不确定度的数值, "units"):
+        if hasattr(带不确定度的数值.magnitude, "nominal_value") and hasattr(带不确定度的数值.magnitude, "std_dev"):
+            return Q_(带不确定度的数值.magnitude.std_dev, 带不确定度的数值.units)
+    elif hasattr(带不确定度的数值, "nominal_value") and hasattr(带不确定度的数值, "std_dev"):
+        return 带不确定度的数值.std_dev
+    raise ValueError("输入的数值不包含不确定度信息。")
+
+def 一元线性回归(x, y):
+    """
+    带不确定度的一元线性回归
+    参数:
+        x: 自变量数组，元素可以是带不确定度的数值。
+        y: 因变量数组，元素必须是带不确定度的数值。
+    返回:
+        截距 a 和斜率 b，与输入同种类。
+    备注:
+        使用加权最小二乘法进行回归，权重为因变量的不确定度的倒数。
+    """
+    if len(x) != len(y):
+        raise ValueError("x 和 y 的长度必须相等。")
+    
+    w=np.array([1/提取不确定度(yi) for yi in y],dtype=object)
+
+    a=((w*y).sum()*(w*x**2).sum()-(w*x).sum()*(w*x*y).sum())/(w.sum()*(w*x**2).sum()-((w*x).sum())**2)
+    b=(w.sum()*(w*x*y).sum()-(w*y).sum()*(w*x).sum())/(w.sum()*(w*x**2).sum()-((w*x).sum())**2)
+
+    return a,b
+
+def 绘制回归图(x:Q_, y:Q_, title=None, xlabel=None, ylabel=None):
+    """
+    绘制带不确定度的一元线性回归图
+    参数:
+        x: 自变量数组，元素可以是带不确定度的数值。
+        y: 因变量数组，元素必须是带不确定度的数值。
+    """
+    a, b = 一元线性回归(x, y)
+
+    if title is None:
+        title = "带不确定度的一元线性回归图"
+    if xlabel is None:
+        xlabel = "自变量"
+    if ylabel is None:
+        ylabel = "因变量"
+
+    x_vals = np.linspace(min(x).magnitude, max(x).magnitude, 100)
+    y_vals = a.n + b.n * x_vals
+
+    plt.errorbar(
+        [xi.magnitude for xi in x],
+        [提取标称值(yi).magnitude for yi in y],
+        yerr=[提取不确定度(yi).magnitude for yi in y],
+        fmt='o', label='数据点'
+    )
+    plt.plot(x_vals, y_vals, 'r-', label='回归线')
+    plt.xlabel(f'{xlabel}/{x.units}')
+    y=Q_([yi.magnitude for yi in y],y[0].units)
+    plt.ylabel(f'{ylabel}/{y.units}')
+    plt.title(title)
+    plt.legend()
+    plt.show()
+\end{lstlisting}
+
+4. 实验误差计算（phyexp/error.py）
+\begin{lstlisting}[caption=phyexp/error.py 代码内容, label=lst:error]
+"""
+实验误差计算工具
+"""
+
+from .utils import ureg, Q_
+from functools import wraps
+
+
+def 提取标称值(带不确定度的数值):
+    """提取带不确定度的数值的标称值（即测量值）。"""
+    if hasattr(带不确定度的数值, "magnitude") and hasattr(带不确定度的数值, "units"):
+        if hasattr(带不确定度的数值.magnitude, "nominal_value") and hasattr(
+            带不确定度的数值.magnitude, "std_dev"
+        ):
+            return Q_(带不确定度的数值.magnitude.nominal_value, 带不确定度的数值.units)
+    elif hasattr(带不确定度的数值, "nominal_value") and hasattr(
+        带不确定度的数值, "std_dev"
+    ):
+        return 带不确定度的数值.nominal_value
+    return 带不确定度的数值
+
+
+def 预处理(func):
+    """装饰器：预处理函数参数，提取带不确定度数值的标称值。"""
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        新args = [提取标称值(arg) for arg in args]
+        新kwargs = {k: 提取标称值(v) for k, v in kwargs.items()}
+        return func(*新args, **新kwargs)
+
+    return wrapper
+
+
+@预处理
+def 相对误差(测量值, 真值, str: bool = False, n=3):
+    """计算测量值与真值之间的误差。"""
+    if str:
+        tem = (测量值 - 真值) / 真值
+        if hasattr(tem, "magnitude"):
+            tem = tem.magnitude
+        return f"{tem:.{n}%}"
+    else:
+        return (测量值 - 真值) / 真值
+\end{lstlisting}
+
+5. 包初始化（phyexp/\_\_init\_\_.py）
+\begin{lstlisting}[caption=phyexp/__init__.py 代码内容, label=lst:init]
+from .AB_uncert import 求A类不确定度 as A_uncert
+\end{lstlisting}
+
+6. 测量结果处理（phyexp/meas.py）
+\begin{lstlisting}[caption=phyexp/meas.py 代码内容, label=lst:meas]
+"""
+测量量处理工具
+"""
+
+from .utils import ureg, Q_, ufloat
+from typing import Sequence
+from .AB_uncert import 求A类不确定度, 不确定度合成
+from uncertainties.core import UFloat, AffineScalarFunc
+import numpy as np
+
+
+def 一次测量结果(数值, 单位: str = "", B类不确定度: float = 0.0, 名称: str = ""):
+    # 一次测量结果的不确定度等于其B类不确定度
+    带不确定度的数值 = ufloat(数值, B类不确定度, tag=名称 if 名称 else None)
+    obj = Q_(带不确定度的数值, 单位)
+    return obj
+
+
+def 多次测量结果(数值列表, 单位: str = "", B类不确定度: float = 0.0, 名称: str = ""):
+    # 多次测量结果的不确定度等于A类不确定度与B类不确定度合成
+    数值列表 = 数值列表.magnitude if isinstance(数值列表, Q_) else np.array(数值列表)
+    A类不确定度 = 求A类不确定度(数值列表)
+    不确定度 = 不确定度合成(A类不确定度, B类不确定度)
+    平均值 = 数值列表.mean()
+    带不确定度的数值 = ufloat(平均值, 不确定度, tag=名称 if 名称 else None)
+    obj = Q_(带不确定度的数值, 单位)
+    return obj
+\end{lstlisting}
+
+7. 有效数字修约（phyexp/sigfigs.py）
+\begin{lstlisting}[caption=phyexp/sigfigs.py 代码内容, label=lst:sigfigs]
+"""
+有效数字修约工具
+"""
+from uncertainties import UFloat
+from uncertainties import ufloat
+from math import log10, floor
+
+
+def 修约(带不确定度数值: UFloat, 字符串形式=True):
+    """修约一个不确定度数值到其有效数字位数。
+
+    参数:
+        带不确定度数值 (UFloat): 需要修约的不确定度数值。
+
+    返回:
+        UFloat: 修约后的不确定度数值。
+    """
+    if 带不确定度数值.std_dev == 0:
+        if 字符串形式:
+            return f"{带不确定度数值:g}"
+        else:
+            return 带不确定度数值
+    else:
+        位 = -floor(log10(abs(带不确定度数值.std_dev)))
+        修约值 = ufloat(
+            round(带不确定度数值.nominal_value, 位), round(带不确定度数值.std_dev, 位)
+        )
+        if 字符串形式:
+            return f"{修约值:g}"
+        else:
+            return 修约值
+
+
+# 无法处理单位
+
+
+from uncertainties import ufloat_fromstr as u
+from uncertainties.umath import *
+
+"""
+用u来创建需考虑不确定度的数值，并直接使用数学函数进行计算
+可以用dir()查看可用的函数
+"""
+\end{lstlisting}
+
+8. 不确定度计算核心（phyexp/AB\_uncert.py）
+\begin{lstlisting}[caption=phyexp/AB_uncert.py 代码内容, label=lst:ab_uncert]
+"""
+物理实验中涉及的不确定度计算
+"""
+
+import numpy as np
+import types
+import warnings
+
+
+def 可向量化(数字列表):
+    """
+    将不支持向量化的列表转换为numpy数组。
+
+    参数:
+    数字列表: 一组数字。
+
+    返回:
+    numpy数组(dtype可以为object)或原始输入。
+    """
+    attrs = [
+        "__len__",
+        "mean",
+        "std",
+    ]
+    test = all(hasattr(数字列表, attr) for attr in attrs)
+    if test:
+        return 数字列表
+    else:
+        try:
+            result = np.asarray(数字列表)
+        except Exception as e:
+            try:
+                result = np.asarray(数字列表, dtype=object)
+            except Exception:
+                raise TypeError(f"无法将输入转换为numpy数组: {e}")
+
+        return result
+
+
+def 输入转换(func):
+    """
+    装饰器：将输入调整为不确定度合成所需类型。
+
+    参数:
+    func: 需要装饰的函数。
+
+    返回:
+    function: 装饰后的函数。
+    """
+
+    def wrapper(*分量):
+        新分量 = [可向量化(i) for i in 分量]
+        return func(*新分量)
+
+    return wrapper
+
+
+def generator_to_list_warning(func):
+    """
+    装饰器：如果输入是生成器，则转换为列表并发出警告。
+
+    参数:
+    func: 需要装饰的函数。
+
+    返回:
+    function: 装饰后的函数。
+    """
+
+    def wrapper(测量值列表):
+        if isinstance(测量值列表, types.GeneratorType):
+            测量值列表 = list(测量值列表)
+            warnings.warn(
+                "生成器已被迭代并转换为列表，后续无法再次使用此生成器（生成器是一次性迭代对象）。",
+                UserWarning,  # 警告类型（用户级警告，最常用）
+                stacklevel=2,  # 控制警告的栈层级，让用户看到自己的代码行（而非函数内部）
+            )
+        return func(测量值列表)
+
+    return wrapper
+
+
+@generator_to_list_warning
+@输入转换
+def 求A类不确定度(测量值列表):
+    """
+    计算A类不确定度，基于测量值均值的样本标准差（贝塞尔公式）。
+
+    参数:
+    测量值列表: 一组测量值（支持列表、元组、np数组、pint带单位量、pd.Series等可迭代对象）。
+
+    返回:
+    float/np.float64/pint.Quantity: A类不确定度（输入带单位则返回带单位结果）。
+    """
+
+    if len(测量值列表) < 2:
+        raise ValueError("测量值列表至少应包含两个值以计算A类不确定度。")
+    标准偏差 = 测量值列表.std(ddof=1) / (len(测量值列表) ** 0.5)
+
+    return 标准偏差
+
+
+A_uncert = 求A类不确定度
+
+# 支持的分布及其对应的包含因子K
+包含因子 = {
+    "均匀": 3**0.5,
+    "正态": 3,  # 3σ原则
+}
+
+
+# 这样的函数只是为了使用时更直观
+def 仪器误差限转B类不确定度(仪器误差限, 分布="均匀", K=3**0.5):
+    """
+    将仪器误差限转换为B类不确定度。
+    参数:
+    仪器误差限: 仪器误差限值（正数）。
+    分布: 仪器误差的分布类型，支持"均匀"和"正态"。默认值为"均匀"。
+    K: 如果分布类型未知，可直接提供分布因子K（正数）。默认值为3的平方根（对应均匀分布）。
+    返回:
+    float: B类不确定度。
+    """
+
+    if 分布 in 包含因子:
+        K = 包含因子[分布]
+    elif 分布 is not None:
+        现有分布类型 = list(包含因子.keys())
+        raise ValueError(f"未知分布类型'{分布}'，目前只支持{现有分布类型}。")
+    elif K <= 0:
+        raise ValueError("分布因子K应为正数。")
+    elif K > 0:
+        pass
+    else:
+        raise ValueError("未知错误。")
+
+    return 仪器误差限 / K
+
+
+InstErr_to_B_uncert = 仪器误差限转B类不确定度
+
+
+# 这个函数只是为了使用时更直观
+def 不确定度合成(A分量, B分量):
+    """
+    计算不确定度合成，基于各分量的不确定度平方和的平方根。
+    只能处理标量输入和数组输入。
+
+    参数:
+    分量: AB分量。
+
+    返回:
+    float: 合成不确定度。
+    """
+    return (A分量**2 + B分量**2) ** 0.5
+
+
+uncert_comb = 不确定度合成
+\end{lstlisting}
+    
+\end{document}

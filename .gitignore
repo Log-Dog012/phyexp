@@ -4,3 +4,6 @@ phyexp.egg-info
 # Python 字节码缓存
 __pycache__/
 *.py[cod]
+
+# Jupyter Notebook 检查点
+.ipynb_checkpoints
