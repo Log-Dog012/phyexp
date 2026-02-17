@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from uncertainties import UFloat
 from uncertainties import ufloat
 from math import log10, floor
