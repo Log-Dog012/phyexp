@@ -1,0 +1,29 @@
+name: phyexp-action-sync
+# 触发规则：每天北京时间8点同步 + 手动触发
+on:
+  schedule:
+    - cron: '0 0 * * *'  # UTC 0点 = 北京时间8点
+  workflow_dispatch:       # 手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 配置SSH授权
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+
+      - name: 信任GitHub SSH主机
+        run: ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: 克隆Gitee仓库并同步所有分支+标签到GitHub
+        run: |
+          # 1. 克隆Gitee仓库的完整镜像（包含所有分支、标签）
+          git clone --mirror https://gitee.com/Log-Dog012/phyexp.git temp-mirror
+          cd temp-mirror
+          # 2. 添加GitHub作为远程镜像
+          git remote add github-mirror git@github.com:Log-Dog012/phyexp.git
+          # 3. 安全强制推送所有分支+ 所有标签
+          git push --force github-mirror --all
+          git push --force github-mirror --tags
