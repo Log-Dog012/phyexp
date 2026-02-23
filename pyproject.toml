@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "phyexp"
+version = "0.1.0.dev0"
+authors = [
+  { name="Log-Dog012" }
+]
+description = "用于大学物理实验数据处理的Python库，支持物理量单位管理、不确定度计算、线性拟合等"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "numpy",
+  "uncertainties",
+  "pint",
+  "matplotlib"
+]
+
+# 关键新增：明确指定只打包 phyexp 包
+[tool.setuptools.packages.find]
+where = ["."]          # 扫描根目录
+include = ["phyexp*"]  # 只包含以 phyexp 开头的文件夹

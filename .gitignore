@@ -1,3 +1,6 @@
+# 配置
+.vscode
+
 # 包信息
 phyexp.egg-info
 
