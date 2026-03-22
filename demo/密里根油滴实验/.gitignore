@@ -1,0 +1,10 @@
+生成pdf.txt
+*.aux
+*.log
+*.out
+*.toc
+*synctex.gz
+*.xdv
+*.fls
+*.fdb_latexmk
+*_files/
