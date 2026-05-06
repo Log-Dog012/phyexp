@@ -4,7 +4,7 @@
 测量量
 """
 
-from .utils import ureg, Q_, ufloat
+from .utils import ureg, Q_, ufloat, uarray
 from typing import Sequence
 from .AB_uncert import 求A类不确定度, 不确定度合成
 from uncertainties.core import UFloat, AffineScalarFunc
@@ -27,3 +27,10 @@ def 多次测量结果(数值列表, 单位: str = "", B类不确定度: float =
     带不确定度的数值 = ufloat(平均值, 不确定度, tag=名称 if 名称 else None)
     obj = Q_(带不确定度的数值, 单位)
     return obj
+
+def pnarray(n, u):
+    """
+    n: 带单位的测量值
+    u: 带单位的不确定度
+    """
+    return Q_(uarray(n.magnitude, u.magnitude), n.units)
