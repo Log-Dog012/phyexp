@@ -28,7 +28,7 @@ def 多次测量结果(数值列表, 单位: str = "", B类不确定度: float =
     obj = Q_(带不确定度的数值, 单位)
     return obj
 
-def pnarray(n, u):
+def puarray(n, u):
     """
     n: 带单位的测量值
     u: 带单位的不确定度
