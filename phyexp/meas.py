@@ -32,7 +32,9 @@ def quantity_uarray(n: pint.Quantity, u: pint.Quantity) -> pint.Quantity:
     注：返回的quantity的ureg与n相同
     """
     quantity = n._REGISTRY.Quantity
-    return quantity(uarray(n.magnitude, u.magnitude), n.units)
+    return quantity(uarray(n.magnitude, 
+                           (u.to(n.units)).magnitude), 
+                    n.units)
 
 def quantity_ufloat(n: pint.Quantity, u: pint.Quantity, tag: str = None) -> pint.Quantity:
     """
@@ -43,10 +45,13 @@ def quantity_ufloat(n: pint.Quantity, u: pint.Quantity, tag: str = None) -> pint
     注：返回的quantity的ureg与n相同
     """
     quantity = n._REGISTRY.Quantity
-    return quantity(ufloat(n.magnitude, u.magnitude, tag=tag), n.units)
+    return quantity(ufloat(n.magnitude, 
+                           (u.to(n.units)).magnitude, 
+                           tag=tag), 
+                    n.units)
 
 # 自动判断是数组还是一个数，模仿uarray和ufloat的接口，返回一个带不确定度的quantity
-def uquantity(n, u, tag: str = None):
+def uquantity(n: pint.Quantity, u: pint.Quantity, tag: str = None) -> pint.Quantity:
     """
     n: 测量值，quantity，可以是一个数或数组
     u: 不确定度，quantity

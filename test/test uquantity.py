@@ -6,7 +6,7 @@ from phyexp.meas import uquantity
 
 try:
     n=quantity([1,2,3], 'm')
-    u=quantity([0.1,0.2,0.3], 'm')
+    u=quantity([0.1,0.2,0.3], 'cm')
     result = uquantity(n, u)
     print(result)
 except Exception as e:
@@ -14,7 +14,7 @@ except Exception as e:
 
 try:
     n=quantity(1, 'm')
-    u=quantity(0.1, 'm')
+    u=quantity(0.1, 'mm')
     result = uquantity(n, u)
     print(result)
 except Exception as e:
