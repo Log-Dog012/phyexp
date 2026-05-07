@@ -6,7 +6,7 @@ sys.path.insert(0, r'b:\alot\phyexp')
 
 from pint import UnitRegistry
 from phyexp.utils import ureg, Q_
-from phyexp import ureg_compatible, convert_quantity_to_ureg
+from phyexp.quantity import ureg_compatible, convert_quantity_to_ureg
 import numpy as np
 
 print("=" * 60)
