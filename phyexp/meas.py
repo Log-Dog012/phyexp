@@ -12,9 +12,27 @@ import numpy as np
 
 import pint # 用于标注类型
 
+__all__ = [
+    "多次测量结果",
+    "quantity_uarray",
+    "quantity_ufloat",
+    "uquantity",
+]
+
 # 建议采用uquantity函数来创建带不确定度的quantity，输入时就应该含有单位信息
 
 def 多次测量结果(数值列表, 单位: str = "", B类不确定度: float = 0.0, 名称: str = ""):
+    """根据多次测量值构造带不确定度的物理量。
+
+    参数：
+        数值列表：测量值序列，或已经带单位的 `pint.Quantity`。
+        单位：结果单位。
+        B类不确定度：仪器引入的 B 类不确定度。
+        名称：不确定度对象的标签。
+
+    返回：
+        带不确定度的 `pint.Quantity`。
+    """
     # 多次测量结果的不确定度等于A类不确定度与B类不确定度合成
     数值列表 = 数值列表.magnitude if isinstance(数值列表, Q_) else np.array(数值列表)
     A类不确定度 = 求A类不确定度(数值列表)
@@ -25,25 +43,14 @@ def 多次测量结果(数值列表, 单位: str = "", B类不确定度: float =
     return obj
 
 def quantity_uarray(n: pint.Quantity, u: pint.Quantity) -> pint.Quantity:
-    """
-    n: 测量值数组quantity
-    u: 不确定度数组quantity
-    返回一个magnitude为uarray的quantity，单位与n相同
-    注：返回的quantity的ureg与n相同
-    """
+    """把数组测量值和不确定度合成为 `uarray` 型 quantity。"""
     quantity = n._REGISTRY.Quantity
     return quantity(uarray(n.magnitude, 
                            (u.to(n.units)).magnitude), 
                     n.units)
 
 def quantity_ufloat(n: pint.Quantity, u: pint.Quantity, tag: str = None) -> pint.Quantity:
-    """
-    n: 测量值quantity
-    u: 不确定度quantity
-    tag: 标签，可选
-    返回一个magnitude为ufloat的quantity，单位与n相同
-    注：返回的quantity的ureg与n相同
-    """
+    """把标量测量值和不确定度合成为 `ufloat` 型 quantity。"""
     quantity = n._REGISTRY.Quantity
     return quantity(ufloat(n.magnitude, 
                            (u.to(n.units)).magnitude, 
@@ -52,12 +59,7 @@ def quantity_ufloat(n: pint.Quantity, u: pint.Quantity, tag: str = None) -> pint
 
 # 自动判断是数组还是一个数，模仿uarray和ufloat的接口，返回一个带不确定度的quantity
 def uquantity(n: pint.Quantity, u: pint.Quantity, tag: str = None) -> pint.Quantity:
-    """
-    n: 测量值，quantity，可以是一个数或数组
-    u: 不确定度，quantity
-    tag: 标签，可选，uarray不支持
-    返回一个带不确定度的quantity
-    """
+    """根据输入是标量还是数组，自动选择 `ufloat` 或 `uarray` 构造方式。"""
     if isinstance(n.magnitude, np.ndarray):
         return quantity_uarray(n, u)
     else:

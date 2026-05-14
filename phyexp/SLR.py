@@ -11,8 +11,10 @@ import numpy as np
 from . import plt
 from .error import 提取标称值
 
+__all__ = ["提取不确定度", "一元线性回归", "绘制回归图"]
+
 def 提取不确定度(带不确定度的数值):
-    """提取带不确定度的数值的不确定度。"""
+    """提取数值对象中的标准不确定度。"""
     if hasattr(带不确定度的数值, "magnitude") and hasattr(带不确定度的数值, "units"):
         if hasattr(带不确定度的数值.magnitude, "nominal_value") and hasattr(带不确定度的数值.magnitude, "std_dev"):
             return Q_(带不确定度的数值.magnitude.std_dev, 带不确定度的数值.units)
@@ -26,10 +28,12 @@ def 一元线性回归(x, y):
     参数:
         x: 自变量数组，元素可以是带不确定度的数值。
         y: 因变量数组，元素必须是带不确定度的数值。
+
     返回:
         截距 a 和斜率 b，与输入同种类。
+
     备注:
-        使用加权最小二乘法进行回归，权重为因变量的不确定度的倒数。
+        使用加权最小二乘法进行回归，权重为因变量不确定度的倒数。
     """
     if len(x) != len(y):
         raise ValueError("x 和 y 的长度必须相等。")
@@ -47,6 +51,9 @@ def 绘制回归图(x:Q_, y:Q_, title=None, xlabel=None, ylabel=None):
     参数:
         x: 自变量数组，元素可以是带不确定度的数值。
         y: 因变量数组，元素必须是带不确定度的数值。
+        title: 图标题。
+        xlabel: 横轴标签。
+        ylabel: 纵轴标签。
     """
     a, b = 一元线性回归(x, y)
 

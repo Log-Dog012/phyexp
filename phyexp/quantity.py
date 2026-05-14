@@ -14,16 +14,25 @@ from pint.util import UnitsContainer
 from functools import wraps
 import warnings
 
+__all__ = [
+    "set_internal_ureg",
+    "get_internal_ureg",
+    "convert_quantity_to_ureg",
+    "ureg_compatible",
+]
+
 
 _internal_ureg = None
 
 
 def set_internal_ureg(ureg):
+    """设置库内部使用的 `ureg` 实例。"""
     global _internal_ureg
     _internal_ureg = ureg
 
 
 def get_internal_ureg():
+    """返回库内部当前使用的 `ureg` 实例。"""
     return _internal_ureg
 
 
@@ -67,6 +76,7 @@ def _sync_units(source_ureg, target_ureg):
 
 
 def convert_quantity_to_ureg(q, target_ureg):
+    """把其他 registry 下的 quantity 转换到指定 registry。"""
     if not isinstance(q, _BaseQuantity):
         return q
     if q._REGISTRY is target_ureg:
@@ -169,6 +179,7 @@ def _build_q_class(internal_ureg):
 
 
 def ureg_compatible(func):
+    """装饰器：尽量把参数转换到内部 `ureg` 后再调用函数。"""
     @wraps(func)
     def wrapper(*args, **kwargs):
         if _internal_ureg is None:

@@ -1,20 +1,21 @@
 from IPython.display import Markdown
 from pint import Quantity
 
+__all__ = ["table"]
+
 def table(data:dict[str, Quantity], title:str=None, index:bool=True, caption:str=None, label:str=None, **kwargs) -> Markdown:
-    """
-    Generate a markdown table from a dictionary of data.
+    """把列式数据生成 Markdown 表格。
 
-    Parameters:
-    - data: A dictionary where keys are column names and values are lists of column values.
-    - title: An optional title for the table.
-    - index: An optional boolean indicating whether to include an index column.
-    - caption: An optional caption for the table.
-    - label: An optional label for referencing the table.
-    - kwargs: Additional keyword arguments to customize the markdown table generation.
+    参数：
+        data：字典，键为列名，值为列数据序列。
+        title：表题。
+        index：是否添加索引列。
+        caption：表注。
+        label：表标签，便于在导出文档中引用。
+        kwargs：保留给后续扩展的额外参数。
 
-    Returns:
-    A string containing the markdown code for the table.
+    返回：
+        `IPython.display.Markdown` 对象。
     """
     # Create the header of the table
     headers = list(data.keys())

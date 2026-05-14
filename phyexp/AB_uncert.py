@@ -7,18 +7,23 @@
 import numpy as np
 import types
 import warnings
+from functools import wraps
+
+__all__ = [
+    "可向量化",
+    "输入转换",
+    "generator_to_list_warning",
+    "求A类不确定度",
+    "A_uncert",
+    "仪器误差限转B类不确定度",
+    "InstErr_to_B_uncert",
+    "不确定度合成",
+    "uncert_comb",
+]
 
 
 def 可向量化(数字列表):
-    """
-    将不支持向量化的列表转换为numpy数组。
-
-    参数:
-    数字列表: 一组数字。
-
-    返回:
-    numpy数组(dtype可以为object)或原始输入。
-    """
+    """将非向量化输入尽量转换为可用于数值计算的数组。"""
     attrs = [
         "__len__",
         "mean",
@@ -40,16 +45,9 @@ def 可向量化(数字列表):
 
 
 def 输入转换(func):
-    """
-    装饰器：将输入调整为不确定度合成所需类型。
+    """装饰器：把参数统一转换为适合不确定度计算的向量化输入。"""
 
-    参数:
-    func: 需要装饰的函数。
-
-    返回:
-    function: 装饰后的函数。
-    """
-
+    @wraps(func)
     def wrapper(*分量):
         新分量 = [可向量化(i) for i in 分量]
         return func(*新分量)
@@ -58,16 +56,9 @@ def 输入转换(func):
 
 
 def generator_to_list_warning(func):
-    """
-    装饰器：如果输入是生成器，则转换为列表并发出警告。
+    """装饰器：如果输入是生成器，则先转成列表并提示一次性迭代风险。"""
 
-    参数:
-    func: 需要装饰的函数。
-
-    返回:
-    function: 装饰后的函数。
-    """
-
+    @wraps(func)
     def wrapper(测量值列表):
         if isinstance(测量值列表, types.GeneratorType):
             测量值列表 = list(测量值列表)
