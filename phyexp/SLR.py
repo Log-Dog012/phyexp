@@ -13,6 +13,12 @@ from .error import 提取标称值
 
 __all__ = ["提取不确定度", "一元线性回归", "绘制回归图"]
 
+def _数值(v):
+    """提取可绘图的数值（去掉单位与不确定度包装）。"""
+    if hasattr(v, "magnitude"):
+        return v.magnitude
+    return v
+
 def 提取不确定度(带不确定度的数值):
     """提取数值对象中的标准不确定度。"""
     if hasattr(带不确定度的数值, "magnitude") and hasattr(带不确定度的数值, "units"):
@@ -68,15 +74,15 @@ def 绘制回归图(x:Q_, y:Q_, title=None, xlabel=None, ylabel=None):
     y_vals = a.n + b.n * x_vals
 
     plt.errorbar(
-        [xi.magnitude for xi in x],
-        [提取标称值(yi).magnitude for yi in y],
-        yerr=[提取不确定度(yi).magnitude for yi in y],
+        [xi.magnitude if hasattr(xi, "magnitude") else xi for xi in x],
+        [_数值(提取标称值(yi)) for yi in y],
+        yerr=[_数值(提取不确定度(yi)) for yi in y],
         fmt='o', label='数据点'
     )
     plt.plot(x_vals, y_vals, 'r-', label='回归线')
     plt.xlabel(f'{xlabel}/{x.units}')
-    y=Q_([yi.magnitude for yi in y],y[0].units)
-    plt.ylabel(f'{ylabel}/{y.units}')
+    yunits = y[0].units if hasattr(y[0], "units") else ""
+    plt.ylabel(f'{ylabel}/{yunits}' if yunits else ylabel)
     plt.title(title)
     plt.legend()
     plt.show()

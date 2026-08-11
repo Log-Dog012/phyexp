@@ -18,6 +18,14 @@ dependencies = [
   "matplotlib"
 ]
 
+# 报告生成（nb2latex）可选依赖：pip install phyexp[report]
+[project.optional-dependencies]
+report = [
+  "pypandoc>=1.13",   # markdown → LaTeX（pandoc 封装，缺二进制时可自动下载）
+  "nbclient>=0.9",    # 重新执行 notebook（--execute 时用）
+  "nbformat>=5.5",
+]
+
 # 关键新增：明确指定只打包 phyexp 包
 [tool.setuptools.packages.find]
 where = ["."]          # 扫描根目录

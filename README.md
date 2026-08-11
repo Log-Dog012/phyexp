@@ -12,7 +12,7 @@
 
 通过简单的接口，你可以快速完成数据录入、误差分析、曲线拟合，并自动生成符合实验报告规范的表格、图表和计算过程，让精力更专注于实验本身而非机械操作。
 
-我们还在`demo`中持续更新实验报告模板（主要是`ipynb`的`notebook`格式，对应北航物理实验课程），包括密里根油滴实验、磁场测量、弗兰克-赫兹实验等，希望能帮助大家！
+我们还在[`phyexp-demo`](https://gitee.com/Log-Dog012/phyexp-demo)（独立仓库）中持续更新实验报告模板（主要是`ipynb`的`notebook`格式，对应北航物理实验课程），包括密里根油滴实验、磁场测量、弗兰克-赫兹实验等，希望能帮助大家！
 
 
 ## 核心功能
@@ -31,6 +31,13 @@
 
 4. **报告辅助工具**  
    - 自动生成数据表格（支持 Markdown/LaTeX 格式）  
+   - **`nb2latex`**：把实验报告 notebook 一键转成可排版 LaTeX 并编译 PDF
+     ```bash
+     pip install phyexp[report]        # 报告工具依赖（pypandoc/nbclient）
+     python -m phyexp.nb2latex 实验报告.ipynb --execute --compile
+     ```
+     生成 `<名字>_report/`（report.tex + figures/ + build.bat）：公式用 LaTeX 渲染、
+     数据表转 booktabs 表格、代码入 listings、输出图片自动提取；配合 xelatex 编译中文 PDF。
    - 导出计算过程与结论模板，贴合实验报告规范
 
 

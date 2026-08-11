@@ -13,6 +13,7 @@ import numpy as np
 import pint # 用于标注类型
 
 __all__ = [
+    "一次测量结果",
     "多次测量结果",
     "quantity_uarray",
     "quantity_ufloat",
@@ -20,6 +21,23 @@ __all__ = [
 ]
 
 # 建议采用uquantity函数来创建带不确定度的quantity，输入时就应该含有单位信息
+
+def 一次测量结果(数值, 单位: str = "", 不确定度: float = 0.0, 名称: str = None):
+    """根据单次测量值及其不确定度构造带不确定度的物理量。
+
+    参数：
+        数值：单次测量值（数值或 `pint.Quantity`）。
+        单位：结果单位。
+        不确定度：该测量值的标准不确定度。
+        名称：不确定度对象的标签。
+
+    返回：
+        带不确定度的 `pint.Quantity`。
+    """
+    if isinstance(数值, Q_):
+        单位 = 数值.units
+        数值 = 数值.magnitude
+    return uquantity(Q_(数值, 单位), Q_(不确定度, 单位), tag=名称)
 
 def 多次测量结果(数值列表, 单位: str = "", B类不确定度: float = 0.0, 名称: str = ""):
     """根据多次测量值构造带不确定度的物理量。
