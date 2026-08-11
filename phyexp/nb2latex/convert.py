@@ -43,6 +43,7 @@ PREAMBLE = r"""\documentclass[11pt]{ctexart}
 % ---- 表格 ----
 \usepackage{booktabs}
 \usepackage{longtable}
+\usepackage{array}    % \arraybackslash（pandoc longtable 需要）
 
 % ---- 图片 ----
 \usepackage{graphicx}
@@ -75,11 +76,12 @@ PREAMBLE = r"""\documentclass[11pt]{ctexart}
 \hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
 
 % ---- pandoc 输出兼容 ----
-% pandoc 用 \pandocbounded 包裹图片、\tightlist 控制紧凑列表，
-% 这些宏在 pandoc 模板的 preamble 中定义，这里补齐等效定义
+% pandoc 用 \pandocbounded 包裹图片、\tightlist 控制紧凑列表、
+% \real 表示比例数值，这些宏在 pandoc 模板的 preamble 中定义，这里补齐
 \providecommand{\pandocbounded}[1]{\begingroup\centering #1\endgroup}
 \providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \providecommand{\passthrough}[1]{#1}
+\providecommand{\real}[1]{#1}
 \def\labelenumi{\arabic{enumi}.}
 \def\labelenumii{\alph{enumii}.}
 \def\labelenumiii{\roman{enumiii}.}
@@ -131,24 +133,30 @@ def _execute_nb(nb, kernel="python3", timeout=600):
 # ---------------------------------------------------------------------------
 
 def _sanitize_md(src):
-    """pandoc 预处理：独立的 `---` 行（水平线）会被误判为 simple table 边界，
-    统一替换成 `***`（水平线的另一种写法，无歧义）。
-    注意不动含 `|` 的表格分隔行。"""
-    lines = []
-    for ln in src.splitlines():
+    """pandoc 预处理：
+    1. 独立的 `---` 行（水平线）会被误判为 simple table 边界 → 换成 `***`；
+    2. pipe table 前若无空行，pandoc 不识别表格 → 自动补空行；
+    3. 表格分隔行（--- 且含 |）不受影响。"""
+    lines = src.splitlines()
+    out = []
+    for ln in lines:
+        if re.match(r"^\s*\|", ln) and out and out[-1].strip() \
+                and not re.match(r"^\s*\|", out[-1]):
+            out.append("")          # 表格块开始前补空行
         if re.match(r"^\s*---\s*$", ln):
-            lines.append("***")
-        else:
-            lines.append(ln)
-    return "\n".join(lines)
+            ln = "***"              # 水平线无歧义写法
+        out.append(ln)
+    return "\n".join(out)
 
 
 def _fix_inline_display(s):
     """pandoc 有时把多行数学（含 \\\\ 或 \\begin{aligned} 等）输出成
-    行内 \\(...\\)，这在 LaTeX 中非法；检测到则提升为 \\[...\\]。"""
+    行内 \\(...\\)，这在 LaTeX 中非法；检测到则提升为 \\[...\\]
+    并删除块内空行（display math 中不允许空段落）。"""
     def _repl(m):
         body = m.group(1)
         if "\\\\" in body or "\\begin{" in body or "\\begin{align" in body:
+            body = re.sub(r"\n\s*\n", "\n", body)
             return "\\[" + body + "\\]"
         return m.group(0)
     return re.sub(r"\\\((.*?)\\\)", _repl, s, flags=re.S)
@@ -157,20 +165,23 @@ def _fix_inline_display(s):
 def _render_markdown(src, backend="pandoc"):
     """markdown → LaTeX。
 
-    默认用 pandoc（通过 pypandoc 封装，作为 phyexp 的 report 可选依赖引入，
-    找不到二进制时 pypandoc 可自动下载）；不可用时回退内置渲染器。
+    默认走 pandoc JSON AST + 自写渲染器（ast_to_latex）：
+    - 输出干净 LaTeX，无 pandoc 专属宏（\real/\pandocbounded 等）
+    - 表格 → 简单 booktabs tabular（不用 longtable+minipage）
+    不可用时回退内置渲染器（markdown_latex）。
     """
     if not src.strip():
         return ""
     if backend == "pandoc":
         try:
+            import json
             import pypandoc
-            out = pypandoc.convert_text(
-                _sanitize_md(src), "latex", format="markdown",
-                extra_args=["--wrap=none"])
-            return _fix_inline_display(out.strip())
-        except (ImportError, OSError, RuntimeError) as e:
-            print(f"[警告] pandoc 不可用（{e}），回退到内置渲染器。", file=sys.stderr)
+            from .ast_to_latex import render_blocks
+            ast = json.loads(pypandoc.convert_text(
+                _sanitize_md(src), "json", format="markdown"))
+            return render_blocks(ast.get("blocks", []))
+        except (ImportError, OSError, RuntimeError, ValueError) as e:
+            print(f"[警告] pandoc AST 渲染失败（{e}），回退到内置渲染器。", file=sys.stderr)
     return md_to_latex(src)
 
 
@@ -193,10 +204,10 @@ def _render_outputs(outputs, out_dir, cell_idx):
             data = out.get("data", {})
             if "image/png" in data:
                 fig = f"output_{cell_idx}_{oi}.png"
-                (out_dir / "figures" / fig).write_bytes(base64.b64decode(data["image/png"]))
+                (out_dir / "img" / fig).write_bytes(base64.b64decode(data["image/png"]))
                 lines.append(
                     "\\begin{figure}[H]\n\\centering\n"
-                    f"\\includegraphics[width=0.85\\linewidth]{{figures/{fig}}}\n"
+                    f"\\includegraphics[width=0.85\\linewidth]{{img/{fig}}}\n"
                     "\\end{figure}")
             elif "text/plain" in data:
                 text = _as_text(data["text/plain"])
@@ -212,9 +223,33 @@ def _render_outputs(outputs, out_dir, cell_idx):
 _MD_IMG_RE = re.compile(r"!\[[^\]]*\]\(([^)]+)\)")
 
 
+def _svg_to_png(src, dst):
+    """把 svg 转 png（依次尝试可用工具），成功返回 True。"""
+    for tool, args in [
+        ("rsvg-convert", ["-w", "1200", "-o"]),
+        ("magick", ["-density", "150"]),
+        ("inkscape", ["-z", "-w", "1200", "-o"]),
+    ]:
+        if shutil.which(tool):
+            try:
+                if tool == "magick":
+                    subprocess.run([tool, *args, str(src), str(dst)], check=True,
+                                   capture_output=True, timeout=120)
+                else:
+                    subprocess.run([tool, *args, str(dst), str(src)], check=True,
+                                   capture_output=True, timeout=120)
+                return dst.exists()
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+                continue
+    return False
+
+
 def _copy_md_images(nb, nb_dir, out_dir):
-    """把 markdown cell 引用的本地图片复制到输出目录（保留相对路径），
-    使 pandoc 输出的 \\includegraphics 路径在输出目录下有效。"""
+    """把 markdown cell 引用的本地图片复制到 out_dir/img/（保留相对结构），
+    svg 尝试转 png。返回路径映射 {markdown 引用路径: 输出路径}，
+    供 tex 中 \\includegraphics 路径改写。"""
+    mapping = {}
+    img_dir = out_dir / "img"
     for cell in nb.get("cells", []):
         if cell.get("cell_type") != "markdown":
             continue
@@ -230,10 +265,36 @@ def _copy_md_images(nb, nb_dir, out_dir):
                 print(f"[警告] markdown 引用的图片不存在：{cand}", file=sys.stderr)
                 continue
             rel = cand.relative_to(nb_dir)
-            dest = out_dir / rel
-            if not dest.exists():
-                dest.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(cand, dest)
+            if cand.suffix.lower() == ".svg":
+                png_rel = rel.with_suffix(".png")
+                dest = img_dir / png_rel
+                if not dest.exists():
+                    if _svg_to_png(cand, dest):
+                        print(f"[转换] svg → png：{rel} → img/{png_rel}", file=sys.stderr)
+                    else:
+                        print(f"[警告] 未找到 svg 转换工具（rsvg-convert/magick/inkscape），"
+                              f"tex 将直接引用 svg：{rel}", file=sys.stderr)
+                        dest = img_dir / rel
+                mapping[p] = f"img/{png_rel.as_posix()}"
+            else:
+                dest = img_dir / rel
+                if not dest.exists():
+                    dest.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(cand, dest)
+                mapping[p] = f"img/{rel.as_posix()}"
+    return mapping
+
+
+_IMGINC_RE = re.compile(r"\\includegraphics(\[[^\]]*\])?\{([^}]+)\}")
+
+
+def _rewrite_img_paths(tex_body, mapping):
+    """把 tex 中 \\includegraphics{...} 的路径按映射改写为 img/ 下路径。"""
+    def repl(m):
+        opts, path = m.group(1) or "", m.group(2)
+        newpath = mapping.get(path, path)
+        return f"\\includegraphics{opts}{{{newpath}}}"
+    return _IMGINC_RE.sub(repl, tex_body)
 
 
 # ---------------------------------------------------------------------------
@@ -243,11 +304,17 @@ def _copy_md_images(nb, nb_dir, out_dir):
 def convert(notebook_path, out_dir=None, execute=False, hide_code=False,
             title=None, author=None, md_backend="self", compile_tex=False,
             kernel="python3", timeout=600):
-    """把 notebook 转成 LaTeX 文件夹。
+    """把 notebook 转成可排版的 LaTeX，输出到 notebook 同目录。
+
+    输出结构（默认，可 --out 覆盖）：
+        <notebook 名>.tex   # 成品：可拖到 Overleaf 或本地 xelatex 编译
+        <notebook 名>.pdf   # --compile 时的编译产物
+        img/                # 全部图片（markdown 引用原图 + 代码输出图）
+        build.bat/sh        # 一键编译脚本
 
     参数：
         notebook_path: .ipynb 文件路径
-        out_dir: 输出目录（默认 <notebook 目录>/<名字>_report/）
+        out_dir: 输出目录（默认 notebook 所在目录）
         execute: 是否用 nbclient 重新执行 notebook（需要 nbclient）
         hide_code: 隐藏全部代码 cell（只留输出，适合最终报告）
         title / author: 文档标题 / 作者（可选，默认不生成标题页）
@@ -257,7 +324,7 @@ def convert(notebook_path, out_dir=None, execute=False, hide_code=False,
         timeout: 执行超时（秒）
 
     返回：
-        生成的 report.tex 路径（Path）。
+        生成的 .tex 路径（Path）。
     """
     nb_path = Path(notebook_path)
     if not nb_path.exists():
@@ -269,12 +336,12 @@ def convert(notebook_path, out_dir=None, execute=False, hide_code=False,
         nb = _execute_nb(nb, kernel=kernel, timeout=timeout)
 
     if out_dir is None:
-        out_dir = nb_path.parent / (nb_path.stem + "_report")
+        out_dir = nb_path.parent
     out_dir = Path(out_dir)
-    (out_dir / "figures").mkdir(parents=True, exist_ok=True)
+    (out_dir / "img").mkdir(parents=True, exist_ok=True)
 
-    # markdown 引用的本地图片 → 复制到输出目录（保留相对结构）
-    _copy_md_images(nb, nb_path.parent, out_dir)
+    # markdown 引用的本地图片 → 复制到 img/（svg 转 png），返回路径映射
+    img_map = _copy_md_images(nb, nb_path.parent, out_dir)
 
     print(f"[2/4] 渲染 cell → LaTeX（markdown 后端：{md_backend}）…", file=sys.stderr)
     body = []
@@ -295,13 +362,14 @@ def convert(notebook_path, out_dir=None, execute=False, hide_code=False,
                 body.append("\\end{lstlisting}")
             body.extend(_render_outputs(cell.get("outputs", []), out_dir, idx))
 
+    body_tex = _rewrite_img_paths("\n\n".join(body), img_map)
     tex = (_preamble(title, author) + BODY_OPEN + "\n\n"
-           + "\n\n".join(body) + "\n\n" + BODY_CLOSE)
-    tex_path = out_dir / "report.tex"
+           + body_tex + "\n\n" + BODY_CLOSE)
+    tex_path = out_dir / (nb_path.stem + ".tex")
     tex_path.write_text(tex, encoding="utf-8")
 
     # 编译脚本（方便用户手动改完再编译）
-    _write_build_script(out_dir)
+    _write_build_script(out_dir, nb_path.stem)
 
     print(f"[3/4] 已生成：{tex_path}", file=sys.stderr)
     if compile_tex:
@@ -312,16 +380,16 @@ def convert(notebook_path, out_dir=None, execute=False, hide_code=False,
     return tex_path
 
 
-def _write_build_script(out_dir):
+def _write_build_script(out_dir, stem):
     """生成 build.sh / build.bat，用户改完 tex 后可一键编译。"""
     if sys.platform == "win32":
         script = out_dir / "build.bat"
         script.write_text(
-            "@echo off\r\nlatexmk -xelatex -interaction=nonstopmode report.tex\r\n",
+            f"@echo off\r\nlatexmk -xelatex -interaction=nonstopmode {stem}.tex\r\n",
             encoding="utf-8")
     else:
         script = out_dir / "build.sh"
-        script.write_text("#!/bin/sh\nlatexmk -xelatex -interaction=nonstopmode report.tex\n",
+        script.write_text(f"#!/bin/sh\nlatexmk -xelatex -interaction=nonstopmode {stem}.tex\n",
                           encoding="utf-8")
         script.chmod(0o755)
 
@@ -330,7 +398,7 @@ def _compile(tex_path):
     cwd = tex_path.parent
     stem = tex_path.stem
     candidates = [
-        ["latexmk", "-xelatex", "-interaction=nonstopmode", tex_path.name],
+        ["latexmk", "-f", "-xelatex", "-interaction=nonstopmode", tex_path.name],
         ["xelatex", "-interaction=nonstopmode", tex_path.name],
     ]
     for cmd in candidates:

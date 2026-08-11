@@ -8,7 +8,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(
         description="notebook → 可排版 LaTeX（phyexp 报告生成工具）")
     ap.add_argument("notebook", help=".ipynb 文件路径")
-    ap.add_argument("--out", default=None, help="输出目录（默认 <名字>_report/）")
+    ap.add_argument("--out", default=None, help="输出目录（默认 notebook 所在目录）")
     ap.add_argument("--execute", action="store_true", help="重新执行 notebook（需 nbclient）")
     ap.add_argument("--hide-code", action="store_true", help="隐藏代码 cell，只留输出")
     ap.add_argument("--title", default=None, help="报告标题")
@@ -23,4 +23,5 @@ if __name__ == "__main__":
                   hide_code=args.hide_code, title=args.title, author=args.author,
                   md_backend=args.md_backend, compile_tex=args.compile,
                   kernel=args.kernel)
-    print(f"\n完成：{tex}\n可用 build.bat / build.sh 编译，或直接 xelatex report.tex")
+    print(f"\n完成：{tex}\n可用 build.bat / build.sh 一键编译，"
+          f"或把 .tex + img/ 整个文件夹拖到 Overleaf 编译")
