@@ -224,7 +224,7 @@ _MD_IMG_RE = re.compile(r"!\[[^\]]*\]\(([^)]+)\)")
 
 
 def _svg_to_png(src, dst):
-    """把 svg 转 png（依次尝试可用工具），成功返回 True。"""
+    """把 svg 转 png（依次尝试系统工具与 python 库），成功返回 True。"""
     for tool, args in [
         ("rsvg-convert", ["-w", "1200", "-o"]),
         ("magick", ["-density", "150"]),
@@ -241,7 +241,13 @@ def _svg_to_png(src, dst):
                 return dst.exists()
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
                 continue
-    return False
+    # 最后试 python 库 cairosvg（pip install cairosvg）
+    try:
+        import cairosvg
+        cairosvg.svg2png(url=str(src), write_to=str(dst), output_width=1200)
+        return dst.exists()
+    except Exception:
+        return False
 
 
 def _copy_md_images(nb, nb_dir, out_dir):
@@ -268,14 +274,18 @@ def _copy_md_images(nb, nb_dir, out_dir):
             if cand.suffix.lower() == ".svg":
                 png_rel = rel.with_suffix(".png")
                 dest = img_dir / png_rel
+                dest.parent.mkdir(parents=True, exist_ok=True)
                 if not dest.exists():
                     if _svg_to_png(cand, dest):
                         print(f"[转换] svg → png：{rel} → img/{png_rel}", file=sys.stderr)
+                        mapping[p] = f"img/{png_rel.as_posix()}"
                     else:
-                        print(f"[警告] 未找到 svg 转换工具（rsvg-convert/magick/inkscape），"
+                        print(f"[警告] svg 转换失败（rsvg-convert/magick/inkscape/cairosvg 均不可用），"
                               f"tex 将直接引用 svg：{rel}", file=sys.stderr)
                         dest = img_dir / rel
-                mapping[p] = f"img/{png_rel.as_posix()}"
+                        mapping[p] = f"img/{rel.as_posix()}"
+                else:
+                    mapping[p] = f"img/{png_rel.as_posix()}"
             else:
                 dest = img_dir / rel
                 if not dest.exists():
