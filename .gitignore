@@ -1,8 +1,10 @@
 # 配置
 .vscode
 
-# 包信息
+# 包信息 / 发布产物
 phyexp.egg-info
+dist/
+build/
 
 # Python 字节码缓存
 __pycache__/

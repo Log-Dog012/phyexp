@@ -3,14 +3,22 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "phyexp"
-version = "0.1.0.dev0"
+name = "phyxexp"
+version = "0.1.0"
 authors = [
   { name="Log-Dog012" }
 ]
 description = "用于大学物理实验数据处理的Python库，支持物理量单位管理、不确定度计算、线性拟合等"
 readme = "README.md"
 requires-python = ">=3.9"
+license = { text = "MIT" }
+keywords = ["physics", "experiment", "uncertainty", "unit", "fitting"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering :: Physics",
+]
 dependencies = [
   "numpy",
   "uncertainties",
@@ -18,12 +26,18 @@ dependencies = [
   "matplotlib"
 ]
 
-# 报告生成（nb2latex）可选依赖：pip install phyexp[report]
+[project.urls]
+Homepage = "https://gitee.com/Log-Dog012/phyexp"
+Repository = "https://gitee.com/Log-Dog012/phyexp"
+Documentation = "https://gitee.com/Log-Dog012/phyexp-demo"
+
+# 报告生成（nb2latex）可选依赖：pip install phyxexp[report]
 [project.optional-dependencies]
 report = [
   "pypandoc>=1.13",   # markdown → LaTeX（pandoc 封装，缺二进制时可自动下载）
   "nbclient>=0.9",    # 重新执行 notebook（--execute 时用）
   "nbformat>=5.5",
+  "cairosvg",         # svg → png（nb2latex 转换 svg 图用）
 ]
 
 # 关键新增：明确指定只打包 phyexp 包

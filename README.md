@@ -15,6 +15,28 @@
 我们还在[`phyexp-demo`](https://gitee.com/Log-Dog012/phyexp-demo)（独立仓库）中持续更新实验报告模板（主要是`ipynb`的`notebook`格式，对应北航物理实验课程），包括密里根油滴实验、磁场测量、弗兰克-赫兹实验等，希望能帮助大家！
 
 
+## 安装
+
+PyPI 发布名是 **`phyxexp`**（`import` 名仍为 `phyexp`，不影响任何代码）：
+
+```bash
+pip install phyxexp          # 基础功能
+pip install phyxexp[report]  # 报告生成工具（nb2latex）
+```
+
+或从 Gitee 直接安装最新开发版：
+
+```bash
+pip install "phyexp @ git+https://gitee.com/Log-Dog012/phyexp.git"
+```
+
+## 快速上手
+
+```python
+from phyexp import 多次测量结果, 相对误差, SLR
+```
+
+
 ## 核心功能
 
 1. **物理量处理**  
@@ -33,12 +55,25 @@
    - 自动生成数据表格（支持 Markdown/LaTeX 格式）  
    - **`nb2latex`**：把实验报告 notebook 一键转成可排版 LaTeX 并编译 PDF
      ```bash
-     pip install phyexp[report]        # 报告工具依赖（pypandoc/nbclient）
+     pip install phyxexp[report]   # 报告工具依赖（pypandoc/nbclient/cairosvg）
      python -m phyexp.nb2latex 实验报告.ipynb --execute --compile
      ```
      生成 `<名字>_report/`（report.tex + figures/ + build.bat）：公式用 LaTeX 渲染、
      数据表转 booktabs 表格、代码入 listings、输出图片自动提取；配合 xelatex 编译中文 PDF。
    - 导出计算过程与结论模板，贴合实验报告规范
+
+
+## 发布到 PyPI
+
+PyPI 发布名是 **`phyxexp`**（`import phyexp` 不变）。发布流程：
+
+```bash
+pip install build twine
+python -m build                  # 生成 dist/ 下的 sdist + wheel
+twine upload dist/*              # 需要 PyPI 账号（www.pypi.org/manage/account/token/ 生成令牌）
+```
+
+版本号在 `pyproject.toml` 的 `version` 字段，每次发布递增。
 
 
 ## 说明文档策略
