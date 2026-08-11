@@ -1,8 +1,8 @@
 # 配置
 .vscode
 
-# 包信息 / 发布产物
-phyexp.egg-info
+# 包信息 / 发布产物（* 覆盖 phyexp.egg-info / phyxexp.egg-info）
+*.egg-info
 dist/
 build/
 
