@@ -271,6 +271,10 @@ def _copy_md_images(nb, nb_dir, out_dir):
                 print(f"[警告] markdown 引用的图片不存在：{cand}", file=sys.stderr)
                 continue
             rel = cand.relative_to(nb_dir)
+            if rel.parts[0] == "img":
+                # 已在 img/ 下的图片直接引用，不再复制（避免 img/img/ 嵌套）
+                mapping[p] = rel.as_posix()
+                continue
             if cand.suffix.lower() == ".svg":
                 png_rel = rel.with_suffix(".png")
                 dest = img_dir / png_rel

@@ -118,7 +118,6 @@ def _table(lines):
             aligns.append("l")
         else:
             aligns.append("c")
-    spec = "".join(aligns) if len(aligns) == len(cols) else "c" * len(cols)
 
     rows = []
     i = 2
@@ -131,6 +130,21 @@ def _table(lines):
             cells += [""] * (len(cols) - len(cells))
         rows.append(cells[:len(cols)])
         i += 1
+
+    # 内容过长的表格改为全列可换行的 p{} 列（按内容量比例分配 \linewidth），避免溢出页面
+    _WRAP_THRESHOLD = 14  # 单元格最大字符数超过该值的表格需要换行
+    col_len = []
+    for j in range(len(cols)):
+        texts = [cols[j]] + [r[j] for r in rows]
+        col_len.append(max(len(t) for t in texts))
+    if max(col_len) > _WRAP_THRESHOLD:
+        total = sum(col_len)
+        spec = "".join(
+            ">{\\raggedright\\arraybackslash}p{%.3f\\linewidth}" % (0.98 * L / total)
+            for L in col_len
+        )
+    else:
+        spec = "".join(aligns) if len(aligns) == len(cols) else "c" * len(cols)
 
     out = ["\\begin{table}[H]", "\\centering",
            "\\begin{tabular}{" + spec + "}",
